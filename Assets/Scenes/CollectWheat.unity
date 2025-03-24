@@ -148,8 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d49961a3dfdb4b94790bce1ca91736e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapPoints:
-  - {fileID: 0}
+  snapPoints: []
   draggableObjects:
   - {fileID: 249140249}
   snapRange: 1
@@ -269,7 +268,7 @@ GameObject:
   - component: {fileID: 249140250}
   - component: {fileID: 249140249}
   m_Layer: 0
-  m_Name: Wheat
+  m_Name: Siccle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
