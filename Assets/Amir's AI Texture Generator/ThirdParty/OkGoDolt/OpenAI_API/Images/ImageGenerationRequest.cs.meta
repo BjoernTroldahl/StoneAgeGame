@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d74ff708e7633ae4c9310ea082cbeaeb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258109
+  packageName: Amir's AI Texture Generator
+  packageVersion: 1.0
+  assetPath: Assets/Amir's AI Texture Generator/ThirdParty/OkGoDolt/OpenAI_API/Images/ImageGenerationRequest.cs
+  uploadId: 609079

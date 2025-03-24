@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 22537c0752b5766428233a6d94fb38a0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 258109
+  packageName: Amir's AI Texture Generator
+  packageVersion: 1.0
+  assetPath: Assets/Amir's AI Texture Generator/Main Script/GenerateTexture.cs
+  uploadId: 609079
