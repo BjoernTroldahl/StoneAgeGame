@@ -17,6 +17,9 @@ public class DigUpHoles : MonoBehaviour
         if (hole1) InitializeHole(hole1);
         if (hole2) InitializeHole(hole2);
         if (hole3) InitializeHole(hole3);
+
+        // Debug log to verify initialization
+        Debug.Log($"Holes initialized: {holes.Count}");
     }
 
     private void InitializeHole(GameObject hole)
@@ -27,11 +30,14 @@ public class DigUpHoles : MonoBehaviour
 
         if (spriteRenderer != null && boxCollider != null)
         {
-            holes.Add(hole, false);
+            holes[hole] = false; // Use dictionary indexer instead of Add
             // Make sprite invisible but keep collider active
             Color spriteColor = spriteRenderer.color;
             spriteColor.a = 0f; // Set alpha to 0 (fully transparent)
             spriteRenderer.color = spriteColor;
+            
+            // Debug log to verify each hole's initial state
+            Debug.Log($"Initialized hole {hole.name}: visible = {holes[hole]}");
         }
         else
         {
@@ -60,9 +66,25 @@ public class DigUpHoles : MonoBehaviour
                         spriteColor.a = 1f;
                         spriteRenderer.color = spriteColor;
                         holes[clickedObject] = true;
+                        
+                        // Debug log when a hole becomes visible
+                        Debug.Log($"Made hole {clickedObject.name} visible");
                     }
                 }
             }
         }
+    }
+
+    // Add this method to the DigUpHoles class
+    public bool IsHoleVisible(GameObject hole)
+    {
+        if (holes.ContainsKey(hole))
+        {
+            // Debug log for visibility checks
+            Debug.Log($"Checking visibility for {hole.name}: {holes[hole]}");
+            return holes[hole];
+        }
+        Debug.LogWarning($"Hole {hole.name} not found in dictionary");
+        return false;
     }
 }
