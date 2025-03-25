@@ -16,6 +16,17 @@ public class AITextureGeneratorWindow : EditorWindow
     private const string OPENAI_API_ENDPOINT = "https://api.openai.com/v1/images/variations";
     private const string OPENAI_KEY_PREFIX = "sk-";
 
+    private enum APIProvider
+    {
+        OpenAI,
+        DeepSeek
+    }
+
+    private APIProvider selectedProvider = APIProvider.OpenAI;
+    private const string DEEPSEEK_API_ENDPOINT = "https://api.deepseek.com/v1/images/variations";
+    private const string DEEPSEEK_KEY_PREFIX = "sk-";
+    private const string SELECTED_PROVIDER_PREF = "AITextureGenerator_SelectedProvider";
+
     [MenuItem("Window/AI Texture Generator")]
     public static void ShowWindow()
     {
@@ -26,6 +37,7 @@ public class AITextureGeneratorWindow : EditorWindow
     {
         // Load saved API key when window opens
         apiKey = EditorPrefs.GetString(API_KEY_PREF, "");
+        selectedProvider = (APIProvider)EditorPrefs.GetInt(SELECTED_PROVIDER_PREF, 0);
     }
 
     void OnGUI()
@@ -34,6 +46,14 @@ public class AITextureGeneratorWindow : EditorWindow
 
         EditorGUILayout.LabelField("AI Texture Generator", EditorStyles.boldLabel);
         EditorGUILayout.Space();
+
+        // Add provider selection
+        EditorGUI.BeginChangeCheck();
+        selectedProvider = (APIProvider)EditorGUILayout.EnumPopup("API Provider", selectedProvider);
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorPrefs.SetInt(SELECTED_PROVIDER_PREF, (int)selectedProvider);
+        }
 
         // Add API Key field
         EditorGUI.BeginChangeCheck();
@@ -108,20 +128,37 @@ public class AITextureGeneratorWindow : EditorWindow
     private bool ValidateAPIKey()
     {
         if (string.IsNullOrEmpty(apiKey))
-            return false;
-
-        if (!apiKey.StartsWith(OPENAI_KEY_PREFIX))
         {
             EditorUtility.DisplayDialog("Invalid API Key", 
-                "Please enter a valid OpenAI API key starting with 'sk-'", "OK");
+                "Please enter an API key.", "OK");
             return false;
         }
 
-        if (apiKey.Length < 51)
+        switch (selectedProvider)
         {
-            EditorUtility.DisplayDialog("Invalid API Key", 
-                "The API key appears to be too short. Please check your OpenAI API key.", "OK");
-            return false;
+            case APIProvider.OpenAI:
+                if (!apiKey.StartsWith(OPENAI_KEY_PREFIX))
+                {
+                    EditorUtility.DisplayDialog("Invalid API Key", 
+                        "Please enter a valid OpenAI API key starting with 'sk-'", "OK");
+                    return false;
+                }
+                if (apiKey.Length < 51)
+                {
+                    EditorUtility.DisplayDialog("Invalid API Key", 
+                        "The OpenAI API key appears to be too short.", "OK");
+                    return false;
+                }
+                break;
+
+            case APIProvider.DeepSeek:
+                if (!apiKey.StartsWith(DEEPSEEK_KEY_PREFIX))
+                {
+                    EditorUtility.DisplayDialog("Invalid API Key", 
+                        "Please enter a valid DeepSeek API key starting with 'dsk-'", "OK");
+                    return false;
+                }
+                break;
         }
 
         return true;
@@ -133,7 +170,7 @@ public class AITextureGeneratorWindow : EditorWindow
         {
             // Show progress bar
             EditorUtility.DisplayProgressBar("Generating Texture", 
-                "Sending request to OpenAI API...", 0.5f);
+                $"Sending request to {selectedProvider} API...", 0.5f);
 
             // Convert source texture to base64
             byte[] textureBytes = sourceTexture.EncodeToPNG();
@@ -145,12 +182,15 @@ public class AITextureGeneratorWindow : EditorWindow
                 client.DefaultRequestHeaders.Authorization = 
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
 
-                var form = new MultipartFormDataContent();
-                var imageContent = new ByteArrayContent(textureBytes);
-                imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-                form.Add(imageContent, "image", "source.png");
+                var requestContent = selectedProvider == APIProvider.OpenAI 
+                    ? CreateOpenAIRequest(textureBytes)
+                    : CreateDeepSeekRequest(textureBytes);
 
-                var response = await client.PostAsync(OPENAI_API_ENDPOINT, form);
+                string endpoint = selectedProvider == APIProvider.OpenAI 
+                    ? OPENAI_API_ENDPOINT 
+                    : DEEPSEEK_API_ENDPOINT;
+
+                var response = await client.PostAsync(endpoint, requestContent);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -174,6 +214,26 @@ public class AITextureGeneratorWindow : EditorWindow
         {
             EditorUtility.ClearProgressBar();
         }
+    }
+
+    private HttpContent CreateOpenAIRequest(byte[] textureBytes)
+    {
+        var form = new MultipartFormDataContent();
+        var imageContent = new ByteArrayContent(textureBytes);
+        imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        form.Add(imageContent, "image", "source.png");
+        return form;
+    }
+
+    private HttpContent CreateDeepSeekRequest(byte[] textureBytes)
+    {
+        var form = new MultipartFormDataContent();
+        var imageContent = new ByteArrayContent(textureBytes);
+        imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        form.Add(imageContent, "input_image", "source.png");
+        form.Add(new StringContent("1"), "num_images");
+        form.Add(new StringContent("1024x1024"), "size");
+        return form;
     }
 
     private void SaveGeneratedTexture(byte[] textureBytes)
