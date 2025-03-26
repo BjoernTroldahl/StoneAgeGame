@@ -154,7 +154,7 @@ MonoBehaviour:
   - {fileID: 977807313}
   draggableObjects:
   - {fileID: 249140249}
-  snapRange: 1
+  snapRange: 2.5
   holeController: {fileID: 2063334562}
   holes:
   - {fileID: 117293511}

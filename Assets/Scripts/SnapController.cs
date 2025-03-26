@@ -5,7 +5,7 @@ public class SnapController : MonoBehaviour
 {
     public List<Transform> snapPoints;
     public List<Drag> draggableObjects;
-    public float snapRange = 0.5f;
+    public float snapRange = 1.0f;
 
     [Header("Hole References")]
     [SerializeField] private DigUpHoles holeController;
