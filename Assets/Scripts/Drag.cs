@@ -8,27 +8,44 @@ public class Drag : MonoBehaviour
     public DragEndedDelegate dragEndedCallback;
     private bool dragging = false;
     private Vector3 offset;
+    private SpriteRenderer spriteRenderer;
 
-    // Update is called once per frame
+    void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            Debug.LogError("No SpriteRenderer found on draggable object!");
+        }
+    }
+
     void Update()
     {
         if (dragging)
         {
-            // Move object, taking into account original offset
             transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + offset;
         }
-        
     }
 
     private void OnMouseDown()
     {
-        offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        dragging = true;
+        // Only allow dragging if the object is visible (alpha > 0)
+        if (spriteRenderer != null && spriteRenderer.color.a > 0)
+        {
+            offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            dragging = true;
+        }
     }
 
     private void OnMouseUp()
     {
-        dragging = false;
-        dragEndedCallback(this);
+        if (dragging)
+        {
+            dragging = false;
+            if (dragEndedCallback != null)
+            {
+                dragEndedCallback(this);
+            }
+        }
     }
 }

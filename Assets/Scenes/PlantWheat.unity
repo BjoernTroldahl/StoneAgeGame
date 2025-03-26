@@ -484,7 +484,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.61, y: 9.26}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!212 &249140251
 SpriteRenderer:
@@ -550,7 +550,7 @@ Transform:
   m_GameObject: {fileID: 249140248}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.7, y: -5.68, z: 0}
+  m_LocalPosition: {x: 15.65, y: -5.46, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1082,7 +1082,7 @@ GameObject:
   - component: {fileID: 907774057}
   - component: {fileID: 907774056}
   - component: {fileID: 907774055}
-  - component: {fileID: 907774054}
+  - component: {fileID: 907774058}
   m_Layer: 0
   m_Name: Pouch
   m_TagString: Untagged
@@ -1090,18 +1090,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &907774054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 907774053}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!61 &907774055
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1140,13 +1128,13 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 17.68, y: 20.130049}
+    oldSize: {x: 2.72, y: 2.89}
     newSize: {x: 9.61, y: 9.26}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.61, y: 9.26}
+  m_Size: {x: 3, y: 3}
   m_EdgeRadius: 0
 --- !u!212 &907774056
 SpriteRenderer:
@@ -1191,8 +1179,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: 3840663177528195584, guid: 237c166f3c1f2834381aa71cd74664d6, type: 3}
+  m_SortingOrder: 3
+  m_Sprite: {fileID: 6595172018246319583, guid: 2e2f944068e81b0449fd20ed2943e786, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1212,12 +1200,27 @@ Transform:
   m_GameObject: {fileID: 907774053}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.94, y: -6.66, z: 0}
-  m_LocalScale: {x: 0.22826709, y: 0.22826709, z: 0.22826709}
+  m_LocalPosition: {x: 15.53, y: -7.03, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &907774058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 907774053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3505768e622b3734ca79af00463ed9f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  closedPouchSprite: {fileID: 6595172018246319583, guid: 2e2f944068e81b0449fd20ed2943e786, type: 3}
+  openPouchSprite: {fileID: -4235569212107953477, guid: 436b4b319022acf4cb287ef171250a73, type: 3}
+  wheatSeed: {fileID: 249140248}
 --- !u!1 &977807311
 GameObject:
   m_ObjectHideFlags: 0

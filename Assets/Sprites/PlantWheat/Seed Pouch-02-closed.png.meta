@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 353a5453efc49774e93475325254f935
+guid: 2e2f944068e81b0449fd20ed2943e786
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 271614346367887344
-    second: pngegg (20)_0
+      213: 6595172018246319583
+    second: Seed Pouch-02-closed_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pngegg (20)_0
+      name: Seed Pouch-02-closed_0
       rect:
         serializedVersion: 2
-        x: 115
-        y: 26
-        width: 789
-        height: 950
+        x: 376
+        y: 368
+        width: 272
+        height: 289
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0f768271fc7f4c300800000000000000
-      internalID: 271614346367887344
+      spriteID: fddfa240202c68b50800000000000000
+      internalID: 6595172018246319583
       vertices: []
       indices: 
       edges: []
@@ -134,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      pngegg (20)_0: 271614346367887344
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
