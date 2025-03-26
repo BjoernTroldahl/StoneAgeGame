@@ -273,7 +273,6 @@ GameObject:
   - component: {fileID: 117293515}
   - component: {fileID: 117293514}
   - component: {fileID: 117293513}
-  - component: {fileID: 117293512}
   m_Layer: 0
   m_Name: Hole 3
   m_TagString: Untagged
@@ -281,18 +280,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &117293512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 117293511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!61 &117293513
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -440,6 +427,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seedPrefab: {fileID: 249140248}
+  spawnPosition: {x: 15.65, y: -5.46}
 --- !u!61 &249140250
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -808,6 +797,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seedPrefab: {fileID: 0}
+  spawnPosition: {x: 15.65, y: -5.46}
 --- !u!61 &846014086
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -955,6 +946,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seedPrefab: {fileID: 0}
+  spawnPosition: {x: 15.65, y: -5.46}
 --- !u!61 &877915316
 BoxCollider2D:
   m_ObjectHideFlags: 0

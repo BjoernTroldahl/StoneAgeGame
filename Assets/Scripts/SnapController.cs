@@ -11,6 +11,8 @@ public class SnapController : MonoBehaviour
     [SerializeField] private DigUpHoles holeController;
     [SerializeField] private List<GameObject> holes;  // Add holes in same order as snap points
 
+    private Dictionary<Transform, bool> occupiedSnapPoints = new Dictionary<Transform, bool>();
+
     void Start()
     {
         if (holeController == null)
@@ -26,6 +28,12 @@ public class SnapController : MonoBehaviour
         {
             draggable.dragEndedCallback = OnDragEnded;
         }
+
+        // Initialize snap points as unoccupied
+        foreach (Transform snapPoint in snapPoints)
+        {
+            occupiedSnapPoints[snapPoint] = false;
+        }
     }
 
     private void OnDragEnded(Drag draggableObject)
@@ -33,12 +41,14 @@ public class SnapController : MonoBehaviour
         Transform closestSnapPoint = null;
         float shortestDistance = snapRange;
 
-        // Check each snap point
         for (int i = 0; i < snapPoints.Count; i++)
         {
-            // Skip this snap point if its corresponding hole isn't visible
-            if (i < holes.Count && !holeController.IsHoleVisible(holes[i]))
+            // Skip if snap point is occupied or hole isn't visible
+            if (occupiedSnapPoints[snapPoints[i]] || 
+                (i < holes.Count && !holeController.IsHoleVisible(holes[i])))
+            {
                 continue;
+            }
 
             float currentDistance = Vector2.Distance(
                 draggableObject.transform.localPosition, 
@@ -52,10 +62,11 @@ public class SnapController : MonoBehaviour
             }
         }
 
-        // Snap the object if we found a valid snap point within range
         if (closestSnapPoint != null)
         {
             draggableObject.transform.localPosition = closestSnapPoint.localPosition;
+            occupiedSnapPoints[closestSnapPoint] = true; // Mark snap point as occupied
+            draggableObject.LockInPlace();
         }
     }
 }
