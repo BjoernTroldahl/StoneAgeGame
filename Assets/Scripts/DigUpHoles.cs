@@ -102,6 +102,30 @@ public class DigUpHoles : MonoBehaviour
             hole.transform.localScale = new Vector3(0.1408369f, 0.1408369f, 1f);
             
             Debug.Log($"Changed {hole.name} to dirt pile with adjusted order and scale");
+
+            // Check if all holes are now dirt piles
+            CheckGameCompletion();
+        }
+    }
+
+    private void CheckGameCompletion()
+    {
+        bool allHolesCovered = true;
+        
+        // Check each hole's sprite
+        foreach (GameObject hole in holes.Keys)
+        {
+            SpriteRenderer spriteRenderer = hole.GetComponent<SpriteRenderer>();
+            if (spriteRenderer.sprite != dirtPileSprite)
+            {
+                allHolesCovered = false;
+                break;
+            }
+        }
+        
+        if (allHolesCovered)
+        {
+            Debug.Log("CONGRATS, YOU WON THE GAME");
         }
     }
 
