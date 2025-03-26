@@ -65,8 +65,15 @@ public class SnapController : MonoBehaviour
         if (closestSnapPoint != null)
         {
             draggableObject.transform.localPosition = closestSnapPoint.localPosition;
-            occupiedSnapPoints[closestSnapPoint] = true; // Mark snap point as occupied
+            occupiedSnapPoints[closestSnapPoint] = true;
             draggableObject.LockInPlace();
+            
+            // Notify the hole that a seed has snapped to it
+            int snapPointIndex = snapPoints.IndexOf(closestSnapPoint);
+            if (snapPointIndex < holes.Count)
+            {
+                holeController.NotifySeedSnapped(holes[snapPointIndex]);
+            }
         }
     }
 }

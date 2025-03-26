@@ -324,7 +324,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.61, y: 9.26}
+  m_Size: {x: 21.25, y: 9.26}
   m_EdgeRadius: 0
 --- !u!212 &117293514
 SpriteRenderer:
@@ -828,7 +828,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.61, y: 9.26}
+  m_Size: {x: 21.25, y: 9.26}
   m_EdgeRadius: 0
 --- !u!212 &846014087
 SpriteRenderer:
@@ -962,7 +962,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.61, y: 9.26}
+  m_Size: {x: 21.25, y: 9.26}
   m_EdgeRadius: 0
 --- !u!212 &877915317
 SpriteRenderer:
@@ -1477,6 +1477,7 @@ MonoBehaviour:
   hole1: {fileID: 846014084}
   hole2: {fileID: 877915314}
   hole3: {fileID: 117293511}
+  dirtPileSprite: {fileID: -6322530612553107113, guid: 6a5dc8d784d83754fa9492d62eaa41e7, type: 3}
 --- !u!4 &2063334563
 Transform:
   m_ObjectHideFlags: 0
