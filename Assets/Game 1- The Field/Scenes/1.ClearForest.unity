@@ -1802,7 +1802,7 @@ MonoBehaviour:
   fire2Sprite: {fileID: 7470217015063282736, guid: 4821d3e245f0a4c4392c6b040bde6920, type: 3}
   deadTreeSprite: {fileID: 4347544937462273523, guid: ad38ef11ec1407f44a5a9c2d603af1a6, type: 3}
   switchInterval: 0.2
-  burnDuration: 5
+  burnDuration: 3
   deadTreeScale: {x: 0.29, y: 0.29, z: 0.29}
 --- !u!4 &1826559675
 Transform:

@@ -20,6 +20,7 @@ public class TorchFire : MonoBehaviour
 
     private Dictionary<GameObject, Coroutine> activeAnimations = new Dictionary<GameObject, Coroutine>();
     private HashSet<GameObject> burnedTrees = new HashSet<GameObject>();  // Track burned trees
+    private HashSet<GameObject> hiddenTrees = new HashSet<GameObject>();  // Add this field at class level
 
     private void Start()
     {
@@ -41,6 +42,7 @@ public class TorchFire : MonoBehaviour
 
     private void Update()
     {
+        // Check for torch proximity
         if (torch != null)
         {
             // Check distance between torch and each fire sprite
@@ -54,6 +56,25 @@ public class TorchFire : MonoBehaviour
                     {
                         RevealFire(fire);
                     }
+                }
+            }
+        }
+
+        // Check for clicks on dead trees
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (hit.collider != null)
+            {
+                GameObject clickedObject = hit.collider.gameObject;
+                int treeIndex = System.Array.IndexOf(treeObjects, clickedObject);
+                
+                // Check if clicked object is a burned tree
+                if (treeIndex >= 0 && treeIndex < fireSprites.Length && burnedTrees.Contains(fireSprites[treeIndex]))
+                {
+                    HideDeadTree(clickedObject);
                 }
             }
         }
@@ -128,5 +149,27 @@ public class TorchFire : MonoBehaviour
         spriteRenderer.color = color;
         activeAnimations.Remove(fire);
         Debug.Log($"Tree {treeObject.name} changed to dead tree");
+    }
+
+    private void HideDeadTree(GameObject tree)
+    {
+        if (!hiddenTrees.Contains(tree))
+        {
+            SpriteRenderer treeRenderer = tree.GetComponent<SpriteRenderer>();
+            if (treeRenderer != null)
+            {
+                Color color = treeRenderer.color;
+                color.a = 0f;
+                treeRenderer.color = color;
+                hiddenTrees.Add(tree);
+                Debug.Log($"Dead tree hidden: {tree.name}");
+
+                // Check if all burned trees are now hidden
+                if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)
+                {
+                    Debug.Log("CONGRATS YOU WON THE GAME");
+                }
+            }
+        }
     }
 }
