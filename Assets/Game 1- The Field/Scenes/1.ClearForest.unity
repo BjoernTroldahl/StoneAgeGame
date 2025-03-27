@@ -1826,7 +1826,7 @@ GameObject:
   - component: {fileID: 2026630805}
   - component: {fileID: 2026630804}
   - component: {fileID: 2026630803}
-  - component: {fileID: 2026630802}
+  - component: {fileID: 2026630806}
   m_Layer: 0
   m_Name: Torch
   m_TagString: Untagged
@@ -1834,20 +1834,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2026630802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2026630801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd28a3547dff85b44b0d4e85f4cad968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  seedPrefab: {fileID: 2026630801}
-  spawnPosition: {x: 13.59, y: -4.87}
 --- !u!61 &2026630803
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1882,7 +1868,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 3.25}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -1892,7 +1878,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 3.7, y: 4.92}
+  m_Size: {x: 3.7, y: 11.36}
   m_EdgeRadius: 0
 --- !u!212 &2026630804
 SpriteRenderer:
@@ -1958,12 +1944,24 @@ Transform:
   m_GameObject: {fileID: 2026630801}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.69, y: -4.17, z: 0}
+  m_LocalPosition: {x: 10.355, y: -2.242, z: 0}
   m_LocalScale: {x: 0.2981, y: 0.2981, z: 0.2981}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2026630806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2026630801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17865b0f0b1521341a72284e8e249a76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2063334561
 GameObject:
   m_ObjectHideFlags: 0
