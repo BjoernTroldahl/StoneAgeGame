@@ -8,6 +8,9 @@ public class DigUpHoles : MonoBehaviour
     [SerializeField] private GameObject hole1;
     [SerializeField] private GameObject hole2;
     [SerializeField] private GameObject hole3;
+    [SerializeField] private GameObject hole4;
+    [SerializeField] private GameObject hole5;
+    [SerializeField] private GameObject hole6;
 
     [Header("Sprite References")]
     [SerializeField] private Sprite dirtPileSprite; // Add this reference in inspector
@@ -21,6 +24,9 @@ public class DigUpHoles : MonoBehaviour
         if (hole1) InitializeHole(hole1);
         if (hole2) InitializeHole(hole2);
         if (hole3) InitializeHole(hole3);
+        if (hole4) InitializeHole(hole4);
+        if (hole5) InitializeHole(hole5);
+        if (hole6) InitializeHole(hole6);
 
         Debug.Log($"Holes initialized: {holes.Count}");
     }

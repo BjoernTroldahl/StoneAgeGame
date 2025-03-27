@@ -8,7 +8,7 @@ public class Drag : MonoBehaviour
     [SerializeField] private GameObject seedPrefab;
     [SerializeField] private Vector2 spawnPosition = new Vector2(13.59f, -4.87f);
     private static int seedCount = 0; // Track total seeds
-    private const int MAX_SEEDS = 3; // Maximum number of clones (not including original seed)
+    private const int MAX_SEEDS = 6; // Maximum number of clones (not including original seed)
     
     public delegate void DragEndedDelegate(Drag draggableObject);
     public DragEndedDelegate dragEndedCallback;
