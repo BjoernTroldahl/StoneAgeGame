@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Dragging : MonoBehaviour
 {
-    private bool dragging = false;
+    private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
 
@@ -17,22 +17,22 @@ public class Dragging : MonoBehaviour
 
     void Update()
     {
-        if (dragging)
+        if (isDragging)
         {
-            Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = transform.position.z; // Maintain the original z position
-            transform.position = mousePos + offset;
+            Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            transform.position = new Vector3(mousePosition.x + offset.x, mousePosition.y + offset.y, transform.position.z);
         }
     }
 
     private void OnMouseDown()
     {
-        offset = transform.position - mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        dragging = true;
+        Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        offset = transform.position - mousePosition;
+        isDragging = true;
     }
 
     private void OnMouseUp()
     {
-        dragging = false;
+        isDragging = false;
     }
 }
