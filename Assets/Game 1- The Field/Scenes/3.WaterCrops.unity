@@ -1814,7 +1814,7 @@ MonoBehaviour:
   moveSpeed: 2
   rotationAngle: 45
   rotationDuration: 0.5
-  pouringDuration: 2
+  pouringDuration: 1
   snappingOffset: 2
   seedlingPoints:
   - {fileID: 1771590431}
