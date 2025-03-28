@@ -14,6 +14,9 @@ public class WaterVesselController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private List<Transform> seedlingPoints;
+    [SerializeField] private GameObject waterDropEffect;
+    [SerializeField] private float waterDropOffset = 0.5f; // Add this for water position adjustment
+    
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool isDragging = false;
@@ -22,6 +25,14 @@ public class WaterVesselController : MonoBehaviour
     public bool IsAnimating
     {
         get { return isAnimating; }
+    }
+
+    void Start()
+    {
+        if (waterDropEffect != null)
+        {
+            waterDropEffect.SetActive(false); // Ensure water effect is hidden at start
+        }
     }
 
     private void OnMouseDown()
@@ -84,6 +95,22 @@ public class WaterVesselController : MonoBehaviour
         // Determine direction based on relative position
         float direction = transform.position.x > seedling.position.x ? 1f : -1f;
         
+        // Set water effect direction and position
+        if (waterDropEffect != null)
+        {
+            SpriteRenderer waterSprite = waterDropEffect.GetComponent<SpriteRenderer>();
+            if (waterSprite != null)
+            {
+                // Flip sprite if pouring from right side
+                waterSprite.flipX = (direction > 0);
+                
+                // Adjust water drop position based on direction
+                Vector3 waterPos = waterDropEffect.transform.localPosition;
+                waterPos.x = direction > 0 ? -waterDropOffset : waterDropOffset;
+                waterDropEffect.transform.localPosition = waterPos;
+            }
+        }
+
         // Calculate offset position
         Vector3 offsetPosition = seedling.position + new Vector3(snappingOffset * direction, 0, 0);
 
@@ -105,7 +132,19 @@ public class WaterVesselController : MonoBehaviour
             yield return null;
         }
 
+        // Show water effect during pouring
+        if (waterDropEffect != null)
+        {
+            waterDropEffect.SetActive(true);
+        }
+
         yield return new WaitForSeconds(pouringDuration);
+
+        // Hide water effect
+        if (waterDropEffect != null)
+        {
+            waterDropEffect.SetActive(false);
+        }
 
         // Rotate back
         elapsedTime = 0;
