@@ -14,13 +14,16 @@ public class WaterVesselController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private List<Transform> seedlingPoints;
+    [SerializeField] private List<SpriteRenderer> seedlingRenderers; // Add this line
     [SerializeField] private GameObject waterDropEffect;
     [SerializeField] private float waterDropOffset = 0.5f; // Add this for water position adjustment
-    
+    [SerializeField] private Sprite grownWheatSprite; // Add this for the wheat-03-green sprite
+
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool isDragging = false;
     private bool isAnimating = false;
+    private HashSet<Transform> wateredSeedlings = new HashSet<Transform>();
 
     public bool IsAnimating
     {
@@ -74,6 +77,12 @@ public class WaterVesselController : MonoBehaviour
 
         foreach (Transform seedling in seedlingPoints)
         {
+            // Skip if this seedling is already watered
+            if (wateredSeedlings.Contains(seedling))
+            {
+                continue;
+            }
+
             float distance = Vector2.Distance(transform.position, seedling.position);
             if (distance <= shortestDistance)
             {
@@ -140,10 +149,32 @@ public class WaterVesselController : MonoBehaviour
 
         yield return new WaitForSeconds(pouringDuration);
 
-        // Hide water effect
+        // Hide water effect and grow seedling
         if (waterDropEffect != null)
         {
             waterDropEffect.SetActive(false);
+        }
+
+        // Change seedling sprite and track it
+        if (!wateredSeedlings.Contains(seedling))
+        {
+            // Find corresponding sprite renderer
+            int seedlingIndex = seedlingPoints.IndexOf(seedling);
+            if (seedlingIndex >= 0 && seedlingIndex < seedlingRenderers.Count)
+            {
+                SpriteRenderer seedlingRenderer = seedlingRenderers[seedlingIndex];
+                if (seedlingRenderer != null && grownWheatSprite != null)
+                {
+                    seedlingRenderer.sprite = grownWheatSprite;
+                    wateredSeedlings.Add(seedling);
+
+                    // Check if all seedlings are watered
+                    if (wateredSeedlings.Count == seedlingPoints.Count)
+                    {
+                        Debug.Log("CONGRATULATIONS, YOU WON THE GAME");
+                    }
+                }
+            }
         }
 
         // Rotate back

@@ -1911,8 +1911,16 @@ MonoBehaviour:
   - {fileID: 911458869}
   - {fileID: 251158125}
   - {fileID: 46902265}
+  seedlingRenderers:
+  - {fileID: 1575970471}
+  - {fileID: 147926221}
+  - {fileID: 1813303645}
+  - {fileID: 596629383}
+  - {fileID: 2034109061}
+  - {fileID: 1055607109}
   waterDropEffect: {fileID: 589777001}
-  waterDropOffset: 1
+  waterDropOffset: 1.2
+  grownWheatSprite: {fileID: -441566554028475642, guid: ec4eb0c8474b21e42856c4b000d49179, type: 3}
 --- !u!1 &2034109059
 GameObject:
   m_ObjectHideFlags: 0
