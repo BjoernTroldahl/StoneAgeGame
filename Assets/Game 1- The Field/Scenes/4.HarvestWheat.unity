@@ -217,7 +217,7 @@ GameObject:
   - component: {fileID: 117293515}
   - component: {fileID: 117293514}
   - component: {fileID: 117293513}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -351,7 +351,7 @@ GameObject:
   - component: {fileID: 184443412}
   - component: {fileID: 184443411}
   - component: {fileID: 184443410}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -706,7 +706,7 @@ GameObject:
   - component: {fileID: 846014088}
   - component: {fileID: 846014087}
   - component: {fileID: 846014086}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -840,7 +840,7 @@ GameObject:
   - component: {fileID: 877915318}
   - component: {fileID: 877915317}
   - component: {fileID: 877915316}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -974,7 +974,7 @@ GameObject:
   - component: {fileID: 1397672674}
   - component: {fileID: 1397672673}
   - component: {fileID: 1397672672}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1108,7 +1108,7 @@ GameObject:
   - component: {fileID: 1575970472}
   - component: {fileID: 1575970471}
   - component: {fileID: 1575970470}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Wheat 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1378,6 +1378,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0eff2f9441cc84d42a1ff41402562ebf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bundledWheatSprite: {fileID: -1061743750666946273, guid: b8bf86a97d2695c4a8f6e4dce8632901, type: 3}
+  wheatLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  harvestRadius: 0.5
+  totalWheatCount: 6
+  minSwipeSpeed: 300
+  harvestCooldown: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
