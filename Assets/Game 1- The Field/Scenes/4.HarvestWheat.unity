@@ -1384,7 +1384,7 @@ MonoBehaviour:
     m_Bits: 8
   harvestRadius: 0.5
   totalWheatCount: 6
-  minSwipeSpeed: 300
+  minSwipeSpeed: 600
   harvestCooldown: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
