@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class WaterVesselController : MonoBehaviour
 {
@@ -172,6 +173,7 @@ public class WaterVesselController : MonoBehaviour
                     if (wateredSeedlings.Count == seedlingPoints.Count)
                     {
                         Debug.Log("CONGRATULATIONS, YOU WON THE GAME");
+                        SceneManager.LoadScene(3); // Load the next scene
                     }
                 }
             }

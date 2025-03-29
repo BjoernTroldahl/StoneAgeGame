@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class TorchFire : MonoBehaviour
 {
@@ -167,6 +168,7 @@ public class TorchFire : MonoBehaviour
                 // Check if all burned trees are now hidden
                 if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)
                 {
+                    SceneManager.LoadScene(1); // Load the next scene
                     Debug.Log("CONGRATS YOU WON THE GAME");
                 }
             }

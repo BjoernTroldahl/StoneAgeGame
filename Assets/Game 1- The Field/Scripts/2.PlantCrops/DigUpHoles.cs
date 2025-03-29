@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI; // Add if holes are UI Images
 using System.Collections.Generic;
+using UnityEngine.SceneManagement; 
 
 public class DigUpHoles : MonoBehaviour
 {
@@ -132,6 +133,7 @@ public class DigUpHoles : MonoBehaviour
         if (allHolesCovered)
         {
             Debug.Log("CONGRATS, YOU WON THE GAME");
+            SceneManager.LoadScene(2); // Load the next scene
         }
     }
 
