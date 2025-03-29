@@ -24,8 +24,6 @@ public class DragGrain : MonoBehaviour
     private float lastClickTime;
     private SpriteRenderer grainRenderer;
     private bool isMillingComplete = false;
-    private BoxCollider2D grainCollider; // Add this field
-    private Vector2 originalColliderSize; // Add this field
 
     void Start()
     {
@@ -36,13 +34,6 @@ public class DragGrain : MonoBehaviour
         }
 
         grainRenderer = GetComponent<SpriteRenderer>();
-        grainCollider = GetComponent<BoxCollider2D>();
-        
-        // Store original collider size
-        if (grainCollider != null)
-        {
-            originalColliderSize = grainCollider.size;
-        }
 
         // Hide milling stone top and disable its collider at start
         if (millingStoneTop != null)
@@ -95,7 +86,7 @@ public class DragGrain : MonoBehaviour
                 // Only allow milling stone interaction if milling isn't complete
                 if (!isMillingComplete && hit.collider.gameObject == millingStone && millingStoneTop.enabled == false)
                 {
-                    // Show milling stone top and enable its collider
+                    // First click on milling stone
                     millingStoneTop.enabled = true;
                     if (millingStoneTopCollider != null)
                     {
@@ -113,20 +104,14 @@ public class DragGrain : MonoBehaviour
 
                         if (millingCounter >= maxMillingClicks)
                         {
-                            // Milling complete - hide sprite and disable collider
+                            // Milling complete
                             isMillingComplete = true;
                             millingStoneTop.enabled = false;
-                            if (millingStoneTopCollider != null)
-                            {
-                                millingStoneTopCollider.enabled = false;
-                            }
-                            
-                            // Change to flour sprite and allow dragging
+                            millingStoneTopCollider.enabled = false;
                             if (grainRenderer != null && flourSprite != null)
                             {
                                 grainRenderer.sprite = flourSprite;
-                                isSnapped = false; // Allow dragging again
-                                isDragging = true;
+                                isDragging = true; // Allow dragging again
                             }
                         }
                     }
