@@ -133,7 +133,7 @@ public class DigUpHoles : MonoBehaviour
         if (allHolesCovered)
         {
             Debug.Log("CONGRATS, YOU WON THE GAME");
-            SceneManager.LoadScene(2); // Load the next scene
+            SceneManager.LoadScene(3); // Load the next scene
         }
     }
 

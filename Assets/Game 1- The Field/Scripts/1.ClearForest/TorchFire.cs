@@ -168,7 +168,7 @@ public class TorchFire : MonoBehaviour
                 // Check if all burned trees are now hidden
                 if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)
                 {
-                    SceneManager.LoadScene(1); // Load the next scene
+                    SceneManager.LoadScene(2); // Load the next scene
                     Debug.Log("CONGRATS YOU WON THE GAME");
                 }
             }

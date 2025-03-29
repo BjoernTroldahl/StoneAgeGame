@@ -27,11 +27,48 @@ public class DragSickle : MonoBehaviour
 
     void Start()
     {
+        // Add at start of Start() method
+        Application.logMessageReceived += HandleLog;
+
         mainCamera = Camera.main;
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found!");
+            return;
         }
+
+        // More robust layer verification
+        if (wheatLayer.value == 0)
+        {
+            // Try to find the wheat layer by name
+            int layerNumber = LayerMask.NameToLayer("Wheat");
+            if (layerNumber != -1)
+            {
+                wheatLayer = 1 << layerNumber;
+                Debug.Log($"Found wheat layer automatically: {layerNumber}");
+            }
+            else
+            {
+                Debug.LogError("Wheat Layer not found in build! Please check project settings.");
+            }
+        }
+
+        // Verify wheat objects are on correct layer
+        GameObject[] wheatObjects = GameObject.FindGameObjectsWithTag("Wheat");
+        foreach (GameObject wheat in wheatObjects)
+        {
+            if (!((1 << wheat.layer) == wheatLayer.value))
+            {
+                Debug.LogWarning($"Wheat object {wheat.name} is on wrong layer: {LayerMask.LayerToName(wheat.layer)}");
+            }
+        }
+
+        Debug.Log($"DragSickle initialized with: Harvest Radius={harvestRadius}, Layer={wheatLayer.value}, Expected layer mask={(1 << LayerMask.NameToLayer("Wheat"))}");
+    }
+
+    void OnDestroy()
+    {
+        Application.logMessageReceived -= HandleLog;
     }
 
     void Update()
@@ -44,6 +81,7 @@ public class DragSickle : MonoBehaviour
             {
                 canHarvest = true;
                 harvestTimer = 0f;
+                Debug.Log("Harvesting cooldown finished - Can harvest again");
             }
         }
 
@@ -56,10 +94,12 @@ public class DragSickle : MonoBehaviour
             if (lastPosition != Vector3.zero)
             {
                 currentSwipeSpeed = Vector3.Distance(newPosition, lastPosition) / Time.deltaTime;
+                Debug.Log($"Current swipe speed: {currentSwipeSpeed}, Required: {minSwipeSpeed}, Can Harvest: {canHarvest}");
                 
                 // Only check for wheat if swipe speed is high enough and can harvest
                 if (currentSwipeSpeed >= minSwipeSpeed && canHarvest)
                 {
+                    Debug.Log($"Checking for wheat between {lastPosition} and {newPosition}");
                     CheckForWheatAlongPath(lastPosition, newPosition);
                 }
             }
@@ -87,14 +127,14 @@ public class DragSickle : MonoBehaviour
         offset = transform.position - mousePosition;
         isDragging = true;
         lastPosition = transform.position;
-        //hasHarvestedThisSwipe = false;
+        Debug.Log("Started dragging sickle");
     }
 
     private void OnMouseUp()
     {
         isDragging = false;
         lastPosition = Vector3.zero;
-        //hasHarvestedThisSwipe = false;
+        Debug.Log("Stopped dragging sickle");
     }
 
     private void CheckForWheatAlongPath(Vector3 start, Vector3 end)
@@ -107,12 +147,19 @@ public class DragSickle : MonoBehaviour
             wheatLayer
         );
 
+        // Debug logging for hit detection
+        if (hits.Length > 0)
+        {
+            Debug.Log($"Found {hits.Length} potential wheat objects in path");
+        }
+
         // Only harvest the first unharvested wheat found
         foreach (RaycastHit2D hit in hits)
         {
             GameObject wheat = hit.collider.gameObject;
             if (!harvestedWheat.Contains(wheat))
             {
+                Debug.Log($"Attempting to harvest wheat at position {wheat.transform.position}");
                 BundleWheat(wheat);
                 return; // Exit after harvesting one wheat
             }
@@ -159,6 +206,16 @@ public class DragSickle : MonoBehaviour
                 Debug.Log("CONGRATS YOU WON THE GAME");
                 //SceneManager.LoadScene(0); // Load the first scene and reset the game
             }
+        }
+    }
+
+    void HandleLog(string logString, string stackTrace, LogType type)
+    {
+        string filePath = System.IO.Path.Combine(Application.dataPath, "../game_log.txt");
+        System.IO.File.AppendAllText(filePath, $"[{System.DateTime.Now}] {type}: {logString}\n");
+        if (type == LogType.Error || type == LogType.Exception)
+        {
+            System.IO.File.AppendAllText(filePath, $"Stack Trace: {stackTrace}\n");
         }
     }
 }

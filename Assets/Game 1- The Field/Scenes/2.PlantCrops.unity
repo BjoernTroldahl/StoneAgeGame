@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 117293515}
   - component: {fileID: 117293514}
   - component: {fileID: 117293513}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -413,7 +413,7 @@ GameObject:
   - component: {fileID: 184443412}
   - component: {fileID: 184443411}
   - component: {fileID: 184443410}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -917,7 +917,7 @@ GameObject:
   - component: {fileID: 846014088}
   - component: {fileID: 846014087}
   - component: {fileID: 846014086}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1051,7 +1051,7 @@ GameObject:
   - component: {fileID: 877915318}
   - component: {fileID: 877915317}
   - component: {fileID: 877915316}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1683,7 +1683,7 @@ GameObject:
   - component: {fileID: 1397672674}
   - component: {fileID: 1397672673}
   - component: {fileID: 1397672672}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1817,7 +1817,7 @@ GameObject:
   - component: {fileID: 1575970472}
   - component: {fileID: 1575970471}
   - component: {fileID: 1575970470}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hole 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}

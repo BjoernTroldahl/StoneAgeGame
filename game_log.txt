@@ -1,0 +1,1 @@
+[29/03/2025 13:37:15] Log: DragSickle initialized with: Harvest Radius=0.5, Layer=8, Expected layer mask=8
