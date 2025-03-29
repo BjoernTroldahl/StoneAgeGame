@@ -5,9 +5,13 @@ public class DragGrain : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform snapPoint; // Circle 1 snapping point
     [SerializeField] private Transform snapPoint2; // Circle 2 snapping point
+    [SerializeField] private Transform snapPoint3; // Circle 3 snapping point
     [SerializeField] private SpriteRenderer millingStoneTop;
     [SerializeField] private GameObject millingStone;
     [SerializeField] private Sprite flourSprite;
+    [SerializeField] private GameObject grainPrefab; // Prefab for new grain
+    [SerializeField] private Transform spawnPoint; // Spawn point for new grain
+    [SerializeField] private Sprite originalGrainSprite; // Original grain sprite
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -24,6 +28,8 @@ public class DragGrain : MonoBehaviour
     private float lastClickTime;
     private SpriteRenderer grainRenderer;
     private bool isMillingComplete = false;
+    private bool isSecondGrain = false; // Track if this is the second grain
+    private BoxCollider2D grainCollider; // Add this field
 
     void Start()
     {
@@ -34,6 +40,10 @@ public class DragGrain : MonoBehaviour
         }
 
         grainRenderer = GetComponent<SpriteRenderer>();
+        if (grainRenderer != null)
+        {
+            originalGrainSprite = grainRenderer.sprite; // Store initial sprite
+        }
 
         // Hide milling stone top and disable its collider at start
         if (millingStoneTop != null)
@@ -45,6 +55,9 @@ public class DragGrain : MonoBehaviour
                 millingStoneTopCollider.enabled = false;
             }
         }
+
+        // Get the grain's collider
+        grainCollider = GetComponent<BoxCollider2D>();
     }
 
     void Update()
@@ -60,15 +73,40 @@ public class DragGrain : MonoBehaviour
                 transform.position = snapPoint.position;
                 isSnapped = true;
                 isDragging = false;
+                millingCounter = 0; // Reset counter when snapping to milling position
+                Debug.Log("Grain snapped to milling position - Counter reset to 0");
                 return;
             }
 
-            // Check if close enough to Circle 2 snap point
-            if (isMillingComplete && Vector2.Distance(newPosition, snapPoint2.position) < snapDistance)
+            // Check if close enough to Circle 2/3 snap point
+            if (isMillingComplete && Vector2.Distance(newPosition, 
+                (isSecondGrain ? snapPoint3.position : snapPoint2.position)) < snapDistance)
             {
-                transform.position = snapPoint2.position;
+                transform.position = isSecondGrain ? snapPoint3.position : snapPoint2.position;
                 isSnappedToCircle2 = true;
                 isDragging = false;
+
+                // Only spawn new grain if this isn't the second grain
+                if (!isSecondGrain && grainPrefab != null && spawnPoint != null)
+                {
+                    GameObject newGrain = Instantiate(grainPrefab, spawnPoint.position, Quaternion.identity);
+                    DragGrain newGrainScript = newGrain.GetComponent<DragGrain>();
+                    if (newGrainScript != null)
+                    {
+                        // Copy all necessary references
+                        newGrainScript.snapPoint = this.snapPoint;
+                        newGrainScript.snapPoint2 = this.snapPoint2;
+                        newGrainScript.snapPoint3 = this.snapPoint3;
+                        newGrainScript.millingStoneTop = this.millingStoneTop;
+                        newGrainScript.millingStone = this.millingStone;
+                        newGrainScript.flourSprite = this.flourSprite;
+                        newGrainScript.grainPrefab = this.grainPrefab;
+                        newGrainScript.spawnPoint = this.spawnPoint;
+                        newGrainScript.originalGrainSprite = this.originalGrainSprite;
+                        newGrainScript.isSecondGrain = true; // Mark as second grain
+                        newGrainScript.ResetGrain();
+                    }
+                }
                 return;
             }
 
@@ -92,18 +130,25 @@ public class DragGrain : MonoBehaviour
                     {
                         millingStoneTopCollider.enabled = true;
                     }
+                    // Disable grain collider during milling
+                    if (grainCollider != null)
+                    {
+                        grainCollider.enabled = false;
+                    }
                 }
                 else if (hit.collider == millingStoneTopCollider)
                 {
-                    // Clicking on milling stone top
                     float timeSinceLastClick = Time.time - lastClickTime;
                     if (timeSinceLastClick <= clickTimeWindow)
                     {
                         millingCounter++;
-                        millingStoneTop.flipY = !millingStoneTop.flipY;
+                        // Force the flip state to toggle based on odd/even count
+                        millingStoneTop.flipY = (millingCounter % 2 == 1);
+                        Debug.Log($"Milling Counter: {millingCounter}/{maxMillingClicks}, FlipY: {millingStoneTop.flipY}");
 
-                        if (millingCounter >= maxMillingClicks)
+                        if (millingCounter == maxMillingClicks)
                         {
+                            Debug.Log("Maximum milling reached - Converting to flour");
                             // Milling complete
                             isMillingComplete = true;
                             millingStoneTop.enabled = false;
@@ -112,6 +157,11 @@ public class DragGrain : MonoBehaviour
                             {
                                 grainRenderer.sprite = flourSprite;
                                 isDragging = true; // Allow dragging again
+                            }
+                            // Re-enable grain collider after milling
+                            if (grainCollider != null)
+                            {
+                                grainCollider.enabled = true;
                             }
                         }
                     }
@@ -134,5 +184,42 @@ public class DragGrain : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
+    }
+
+    public void ResetGrain()
+    {
+        // Reset all flags and counters
+        isDragging = false;
+        isSnapped = false;
+        isSnappedToCircle2 = false;
+        isMillingComplete = false;
+        lastClickTime = 0f;
+        millingCounter = 0;
+        
+        Debug.Log("Grain reset - Milling counter reset to 0");
+
+        // Reset sprite to original grain sprite
+        if (grainRenderer == null)
+        {
+            grainRenderer = GetComponent<SpriteRenderer>();
+        }
+        
+        if (grainRenderer != null)
+        {
+            grainRenderer.sprite = originalGrainSprite;
+            grainRenderer.enabled = true;
+        }
+
+        // Reset milling stone top state
+        if (millingStoneTop != null)
+        {
+            millingStoneTop.enabled = false;
+            // Don't reset flipY here anymore
+            millingStoneTopCollider = millingStoneTop.GetComponent<BoxCollider2D>();
+            if (millingStoneTopCollider != null)
+            {
+                millingStoneTopCollider.enabled = false;
+            }
+        }
     }
 }
