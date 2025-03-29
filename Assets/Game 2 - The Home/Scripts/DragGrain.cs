@@ -12,6 +12,7 @@ public class DragGrain : MonoBehaviour
     [SerializeField] private GameObject grainPrefab; // Prefab for new grain
     [SerializeField] private Transform spawnPoint; // Spawn point for new grain
     [SerializeField] private Sprite originalGrainSprite; // Original grain sprite
+    [SerializeField] private SpriteRenderer arrowSign; // Add this field
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -85,6 +86,18 @@ public class DragGrain : MonoBehaviour
                 transform.position = isSecondGrain ? snapPoint3.position : snapPoint2.position;
                 isSnappedToCircle2 = true;
                 isDragging = false;
+
+                // Show arrow sign when second grain snaps to Circle 3
+                if (isSecondGrain && arrowSign != null)
+                {
+                    arrowSign.enabled = true;
+                    // Add BoxCollider2D to arrow if not already present
+                    BoxCollider2D arrowCollider = arrowSign.GetComponent<BoxCollider2D>();
+                    if (arrowCollider != null)
+                    {
+                        arrowCollider.enabled = true;
+                    }
+                }
 
                 // Only spawn new grain if this isn't the second grain
                 if (!isSecondGrain && grainPrefab != null && spawnPoint != null)
@@ -167,6 +180,18 @@ public class DragGrain : MonoBehaviour
                     }
                     lastClickTime = Time.time;
                 }
+            }
+        }
+
+        // Add arrow click detection
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 clickPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(clickPosition, Vector2.zero);
+
+            if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
+            {
+                Debug.Log("CONGRATS YOU WON THE LEVEL");
             }
         }
     }
