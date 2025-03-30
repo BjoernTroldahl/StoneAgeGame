@@ -921,7 +921,7 @@ MonoBehaviour:
   porridgeObject: {fileID: 5294788161525798400}
   bowlObject: {fileID: 2026630805}
   bowlStartPosition: {x: 4.041214, y: 1.8652445, z: 0}
-  snapDistance: 3
+  snapDistance: 4
 --- !u!61 &1343172453
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -979,8 +979,10 @@ GameObject:
   - component: {fileID: 1641991632}
   - component: {fileID: 1641991631}
   - component: {fileID: 1641991633}
+  - component: {fileID: 1641991634}
+  - component: {fileID: 1641991635}
   m_Layer: 0
-  m_Name: StirringStick_0
+  m_Name: MixingStick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1102,6 +1104,51 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.41, y: 8.37}
   m_EdgeRadius: 0
+--- !u!95 &1641991634
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641991630}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1641991635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641991630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae6ed10bb6074f946a66041a5be3c2d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapPoint: {fileID: 870126251}
+  porridgeScript: {fileID: 1343172452}
+  snapDistance: 5
+  snapYOffset: 0.5
+  rotationSpeed: 300
+  requiredRotations: 3
+  stirRadius: 0.5
+  initialRotationDuration: 1
+  finalRotationDuration: 1
+  returnMovementDuration: 1
+  moveToSnapDuration: 0.5
 --- !u!1 &1717491460
 GameObject:
   m_ObjectHideFlags: 0
@@ -1114,7 +1161,7 @@ GameObject:
   - component: {fileID: 1717491462}
   - component: {fileID: 1717491461}
   m_Layer: 0
-  m_Name: Lid_0
+  m_Name: Lid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

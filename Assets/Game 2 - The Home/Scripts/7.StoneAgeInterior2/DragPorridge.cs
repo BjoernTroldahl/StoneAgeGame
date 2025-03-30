@@ -114,4 +114,9 @@ public class DragPorridge : MonoBehaviour
         // Disable all colliders after snapping
         GetComponent<BoxCollider2D>().enabled = false;
     }
+
+    public bool IsSnapped()
+    {
+        return isSnapped;
+    }
 }
