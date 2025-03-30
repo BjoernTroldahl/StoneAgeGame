@@ -92,4 +92,21 @@ public class Drag : MonoBehaviour
             }
         }
     }
+
+    private void OnDestroy()
+    {
+        ResetDragVariables();
+    }
+
+    private static void ResetDragVariables()
+    {
+        seedCount = 0;
+        Debug.Log("Reset DragSeed variables to default values");
+    }
+
+    // You can also make this public if you need to reset from elsewhere
+    public static void ResetAll()
+    {
+        ResetDragVariables();
+    }
 }

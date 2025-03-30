@@ -204,7 +204,7 @@ public class DragSickle : MonoBehaviour
                 harvestedWheat.Count == totalWheatCount)
             {
                 Debug.Log("CONGRATS YOU WON THE GAME");
-                //SceneManager.LoadScene(0); // Load the first scene and reset the game
+                SceneManager.LoadScene(5); // Load the end screen
             }
         }
     }
