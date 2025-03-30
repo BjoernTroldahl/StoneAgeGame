@@ -90,10 +90,10 @@ public class DragMixingStick : MonoBehaviour
                 if (completedRotations >= requiredRotations)
                 {
                     isStirring = false;
-                    isReturning = true;  // Skip final rotation state
+                    isReturning = true;
                     stateTimer = 0f;
                     moveStartPosition = transform.position;
-                    transform.rotation = startRotation;  // Instantly set to start rotation
+                    // Don't change rotation here, let the lerp handle it
 
                     if (beerRenderer != null && mixedBeerSprite != null)
                     {
@@ -108,15 +108,21 @@ public class DragMixingStick : MonoBehaviour
         else if (isReturning)
         {
             stateTimer += Time.deltaTime;
-            float t = stateTimer / returnMovementDuration;
-            transform.position = Vector3.Lerp(moveStartPosition, startPosition, t);
-            transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, -30), startRotation, t);
+            float t = Mathf.Clamp01(stateTimer / returnMovementDuration); // Ensure t is between 0 and 1
+            
+            // Use SmoothStep for smoother animation
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            transform.position = Vector3.Lerp(moveStartPosition, startPosition, smoothT);
+            transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, -30), startRotation, smoothT);
 
             if (t >= 1f)
             {
                 isReturning = false;
                 isComplete = true;
-                IsMixingComplete = true; // Set the static flag
+                IsMixingComplete = true;
+                // Ensure final position and rotation are exact
+                transform.position = startPosition;
+                transform.rotation = startRotation;
                 Debug.Log("Return complete - Mixing stick locked");
             }
         }
