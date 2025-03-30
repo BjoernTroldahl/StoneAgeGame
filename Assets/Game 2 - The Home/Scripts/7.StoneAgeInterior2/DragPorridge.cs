@@ -18,8 +18,9 @@ public class DragPorridge : MonoBehaviour
     private Vector3 offset;
     private Camera mainCamera;
     private Vector3 startPosition;
-    private bool isUncovered = false;
-    // Duplicate declaration removed
+    private bool isPorridgeUncovered = false;
+    private bool isBeerUncovered = false;
+    private bool isLocked = false;
     private SpriteRenderer beerRenderer;
     private SpriteRenderer porridgeRenderer;
 
@@ -58,7 +59,7 @@ public class DragPorridge : MonoBehaviour
 
     void Update()
     {
-        if (isDragging && isUncovered)
+        if (isDragging && isPorridgeUncovered && isBeerUncovered)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             Vector3 newPosition = new Vector3(mousePosition.x + offset.x, mousePosition.y + offset.y, transform.position.z);
@@ -68,14 +69,16 @@ public class DragPorridge : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!isUncovered)
+        if (isLocked) return;
+
+        if (!isPorridgeUncovered)
         {
             // First click - uncover the porridge
             porridgeRenderer.sprite = porridgeUncovered;
-            isUncovered = true;
+            isPorridgeUncovered = true;
             Debug.Log("Porridge uncovered");
         }
-        else
+        else if (isBeerUncovered) // Only allow dragging if beer is also uncovered
         {
             // Start dragging
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -86,7 +89,7 @@ public class DragPorridge : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (isDragging)
+        if (isDragging && isPorridgeUncovered && isBeerUncovered) // Check both states
         {
             isDragging = false;
 
@@ -101,18 +104,20 @@ public class DragPorridge : MonoBehaviour
                 
                 // Return porridge bowl to start
                 transform.position = startPosition;
-                
-                Debug.Log("Porridge emptied into beer vessel");
+                isLocked = true; // Lock the porridge bowl
+                DragHoney.PorridgeHasBeenAdded = true; // Enable honey interaction
+                Debug.Log("Porridge emptied into beer vessel and locked");
             }
         }
     }
 
     // Method to be called from beer vessel script when clicked
-    public static void UncoverBeerVessel(SpriteRenderer beerRenderer, Sprite uncoveredSprite)
+    public static void UncoverBeerVessel(SpriteRenderer beerRenderer, Sprite uncoveredSprite, DragPorridge porridgeScript)
     {
         if (beerRenderer != null && uncoveredSprite != null)
         {
             beerRenderer.sprite = uncoveredSprite;
+            porridgeScript.isBeerUncovered = true;
             Debug.Log("Beer vessel uncovered");
         }
     }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class BeerVessel : MonoBehaviour
 {
     [SerializeField] private Sprite beerUncovered;
+    [SerializeField] private DragPorridge porridgeScript; // Add reference to porridge script
     private SpriteRenderer spriteRenderer;
     private bool isUncovered = false;
 
@@ -15,7 +16,7 @@ public class BeerVessel : MonoBehaviour
     {
         if (!isUncovered)
         {
-            DragPorridge.UncoverBeerVessel(spriteRenderer, beerUncovered);
+            DragPorridge.UncoverBeerVessel(spriteRenderer, beerUncovered, porridgeScript);
             isUncovered = true;
         }
     }
