@@ -82,8 +82,8 @@ public class DragPorridge : MonoBehaviour
                 SpriteRenderer porridgeRenderer = porridgeObject?.GetComponent<SpriteRenderer>();
                 if (porridgeRenderer != null)
                 {
-                    porridgeRenderer.sortingOrder = 2;
-                    Debug.Log("Changed porridge sorting order from 4 to 2");
+                    porridgeRenderer.sortingOrder = 1;
+                    Debug.Log("Changed porridge sorting order from 4 to 1");
                 }
                 
                 // Lock everything
