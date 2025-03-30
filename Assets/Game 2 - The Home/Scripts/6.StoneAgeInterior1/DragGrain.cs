@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DragGrain : MonoBehaviour
 {
@@ -190,8 +191,9 @@ public class DragGrain : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(clickPosition, Vector2.zero);
 
             if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
-            {
+            {   
                 Debug.Log("CONGRATS YOU WON THE LEVEL");
+                SceneManager.LoadScene(6); // Load the next level
             }
         }
     }
