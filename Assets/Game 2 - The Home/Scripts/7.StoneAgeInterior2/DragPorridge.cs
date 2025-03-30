@@ -3,18 +3,39 @@ using UnityEngine;
 public class DragPorridge : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Transform snapPoint;
-    [SerializeField] private Transform porridgeObject;
-    [SerializeField] private Transform bowlObject;
-    [SerializeField] private Vector3 bowlStartPosition;
+    [SerializeField] private Transform beerVesselObject;
+    [SerializeField] private float overlapDistance = 1f;
 
-    [Header("Settings")]
-    [SerializeField] private float snapDistance = 1f;
+    [Header("Sprites")]
+    [SerializeField] private Sprite porridgeCovered;
+    [SerializeField] private Sprite porridgeUncovered;
+    [SerializeField] private Sprite porridgeEmpty;
+    [SerializeField] private Sprite beerCovered;
+    [SerializeField] private Sprite beerUncovered;
+    [SerializeField] private Sprite beerWithPorridge;
 
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
-    private bool isSnapped = false;
+    private Vector3 startPosition;
+    private bool isUncovered = false;
+    // Duplicate declaration removed
+    private SpriteRenderer beerRenderer;
+    private SpriteRenderer porridgeRenderer;
+
+    void Awake()
+    {
+        porridgeRenderer = GetComponent<SpriteRenderer>();
+        if (porridgeRenderer == null)
+        {
+            Debug.LogError("SpriteRenderer not found on DragPorridge!");
+        }
+    }
+
+    public SpriteRenderer GetPorridgeRenderer()
+    {
+        return porridgeRenderer;
+    }
 
     void Start()
     {
@@ -25,79 +46,38 @@ public class DragPorridge : MonoBehaviour
             return;
         }
 
-        if (snapPoint != null)
-        {
-            Debug.Log($"Circle 1 initial position: {snapPoint.position}");
-        }
-        else
-        {
-            Debug.LogError("Snap point (Circle 1) not assigned!");
-        }
+        startPosition = transform.position;
+        porridgeRenderer = GetComponent<SpriteRenderer>();
+        beerRenderer = beerVesselObject?.GetComponent<SpriteRenderer>();
 
-        // Store the bowl's initial position and set initial sorting order
-        if (bowlObject != null)
+        if (porridgeRenderer == null || beerRenderer == null)
         {
-            bowlStartPosition = bowlObject.position;
-        }
-
-        // Set initial Order in Layer
-        SpriteRenderer porridgeRenderer = porridgeObject?.GetComponent<SpriteRenderer>();
-        if (porridgeRenderer != null)
-        {
-            porridgeRenderer.sortingOrder = 4;
+            Debug.LogError("Missing sprite renderer references!");
         }
     }
 
     void Update()
     {
-        if (isDragging && !isSnapped)
+        if (isDragging && isUncovered)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             Vector3 newPosition = new Vector3(mousePosition.x + offset.x, mousePosition.y + offset.y, transform.position.z);
-            
-            // Move the entire prefab (both bowl and porridge)
             transform.position = newPosition;
-
-            // Get the center position of the porridge object
-            Vector3 porridgeCenter = porridgeObject.position;
-            Vector3 snapCenter = snapPoint.position;
-
-            // Debug positions
-            Debug.Log($"Porridge center: {porridgeCenter}, Snap point center: {snapCenter}");
-
-            // Calculate distance between centers
-            float distanceToSnap = Vector2.Distance(porridgeCenter, snapCenter);
-            Debug.Log($"Distance between centers: {distanceToSnap}, Required distance: {snapDistance}");
-
-            // Check for snap distance using centers
-            if (distanceToSnap < snapDistance)
-            {
-                Debug.Log($"Snapping - Distance: {distanceToSnap}");
-                
-                // Snap porridge to circle and bowl to start
-                porridgeObject.position = snapCenter;
-                bowlObject.position = bowlStartPosition;
-                
-                // Change Order in Layer
-                SpriteRenderer porridgeRenderer = porridgeObject?.GetComponent<SpriteRenderer>();
-                if (porridgeRenderer != null)
-                {
-                    porridgeRenderer.sortingOrder = 1;
-                    Debug.Log("Changed porridge sorting order from 4 to 1");
-                }
-                
-                // Lock everything
-                isSnapped = true;
-                DisableColliders();
-                Debug.Log("Snap complete - Porridge centered on Circle 1");
-            }
         }
     }
 
     private void OnMouseDown()
     {
-        if (!isSnapped)
+        if (!isUncovered)
         {
+            // First click - uncover the porridge
+            porridgeRenderer.sprite = porridgeUncovered;
+            isUncovered = true;
+            Debug.Log("Porridge uncovered");
+        }
+        else
+        {
+            // Start dragging
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
@@ -106,28 +86,46 @@ public class DragPorridge : MonoBehaviour
 
     private void OnMouseUp()
     {
-        isDragging = false;
+        if (isDragging)
+        {
+            isDragging = false;
+
+            // Check if porridge bowl overlaps with beer vessel
+            float distanceToBeer = Vector2.Distance(transform.position, beerVesselObject.position);
+            
+            if (distanceToBeer < overlapDistance)
+            {
+                // Change sprites
+                porridgeRenderer.sprite = porridgeEmpty;
+                beerRenderer.sprite = beerWithPorridge;
+                
+                // Return porridge bowl to start
+                transform.position = startPosition;
+                
+                Debug.Log("Porridge emptied into beer vessel");
+            }
+        }
     }
 
-    private void DisableColliders()
+    // Method to be called from beer vessel script when clicked
+    public static void UncoverBeerVessel(SpriteRenderer beerRenderer, Sprite uncoveredSprite)
     {
-        // Disable all colliders after snapping
-        GetComponent<BoxCollider2D>().enabled = false;
+        if (beerRenderer != null && uncoveredSprite != null)
+        {
+            beerRenderer.sprite = uncoveredSprite;
+            Debug.Log("Beer vessel uncovered");
+        }
     }
 
     public bool IsSnapped()
     {
-        return isSnapped;
-    }
-
-    public SpriteRenderer GetPorridgeRenderer()
-    {
-        return porridgeObject?.GetComponent<SpriteRenderer>();
+        // Replace this with the actual logic to determine if the porridge is snapped
+        return true; // Example: Always return true for now
     }
 
     public void LockSnapping()
     {
-        isSnapped = true; // This prevents further snapping
-        Debug.Log("Circle 1 snapping locked");
+        // Implement logic to lock snapping here
+        Debug.Log("Snapping has been locked.");
     }
 }
