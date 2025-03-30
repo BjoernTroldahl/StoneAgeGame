@@ -5,6 +5,7 @@ public class DragMixingStick : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform snapPoint;
     [SerializeField] private DragPorridge porridgeScript;
+    [SerializeField] private Sprite stirredPorridgeSprite; // Add this field
     
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -36,6 +37,10 @@ public class DragMixingStick : MonoBehaviour
     private Vector3 moveStartPosition; // Add this field
     private bool isComplete = false; // Add this field
     private SpriteRenderer spriteRenderer; // Add this field
+
+    // Add new state for moving back to trigger position
+    private bool isMovingToTrigger = false;
+    private Vector3 triggerPosition;
 
     void Start()
     {
@@ -79,14 +84,16 @@ public class DragMixingStick : MonoBehaviour
             if (t >= 1f)
             {
                 isMovingToSnap = false;
-                isInitialRotating = true;
+                isStirring = true;
                 stateTimer = 0f;
-                Debug.Log("Reached snap point, starting initial rotation");
+                currentRotation = 0f;
+                completedRotations = 0;
+                Debug.Log("Reached snap point, starting stirring motion");
             }
         }
         else if (isInitialRotating)
         {
-            // Rotate to 0 degrees
+            // Rotate to 0 degrees first
             stateTimer += Time.deltaTime;
             float t = stateTimer / initialRotationDuration;
             transform.rotation = Quaternion.Lerp(startRotation, Quaternion.Euler(0, 0, 0), t);
@@ -94,9 +101,10 @@ public class DragMixingStick : MonoBehaviour
             if (t >= 1f)
             {
                 isInitialRotating = false;
-                isStirring = true;
+                isMovingToSnap = true; // Move to snap point after rotation
                 stateTimer = 0f;
-                Debug.Log("Initial rotation complete, starting stir");
+                moveStartPosition = transform.position;
+                Debug.Log("Initial rotation complete, moving to snap point");
             }
         }
         else if (isStirring)
@@ -123,47 +131,76 @@ public class DragMixingStick : MonoBehaviour
                 if (completedRotations >= requiredRotations)
                 {
                     isStirring = false;
-                    isFinalRotating = true;
+                    isMovingToTrigger = true; // First move back to trigger position
                     stateTimer = 0f;
-                    snapPosition = transform.position;
-                    Debug.Log("Stirring complete, starting final rotation");
+                    moveStartPosition = transform.position;
+
+                    // Lock Circle 1 by disabling porridge script
+                    if (porridgeScript != null)
+                    {
+                        porridgeScript.LockSnapping();
+                    }
+
+                    // Change porridge sprite
+                    if (porridgeScript != null)
+                    {
+                        SpriteRenderer porridgeRenderer = porridgeScript.GetPorridgeRenderer();
+                        if (porridgeRenderer != null && stirredPorridgeSprite != null)
+                        {
+                            porridgeRenderer.sprite = stirredPorridgeSprite;
+                            Debug.Log($"Changed porridge sprite to {stirredPorridgeSprite.name}");
+                        }
+                    }
+
+                    Debug.Log("Stirring complete, moving back to trigger position");
                 }
             }
         }
-        else if (isFinalRotating)
+        else if (isMovingToTrigger)
         {
-            // Rotate to -90 degrees
             stateTimer += Time.deltaTime;
-            float t = stateTimer / finalRotationDuration;
-            transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 0), Quaternion.Euler(0, 0, -90), t);
+            float t = stateTimer / moveToSnapDuration;
+            transform.position = Vector3.Lerp(moveStartPosition, triggerPosition, t);
 
             if (t >= 1f)
             {
-                isFinalRotating = false;
-                isReturning = true;
+                isMovingToTrigger = false;
+                isFinalRotating = true;
                 stateTimer = 0f;
 
-                // Change and verify Order in Layer here instead
+                // Change Order in Layer here instead of during final rotation
                 if (spriteRenderer != null)
                 {
                     Debug.Log($"Current sorting order before change: {spriteRenderer.sortingOrder}");
                     spriteRenderer.sortingOrder = 6;
                     Debug.Log($"Changed sorting order to: {spriteRenderer.sortingOrder}");
                 }
-                else
-                {
-                    Debug.LogError("SpriteRenderer is null when trying to change sorting order!");
-                }
 
+                Debug.Log("Reached trigger position, starting rotation back to default");
+            }
+        }
+        else if (isFinalRotating)
+        {
+            // Rotate back to starting rotation
+            stateTimer += Time.deltaTime;
+            float t = stateTimer / finalRotationDuration;
+            transform.rotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 0), startRotation, t);
+
+            if (t >= 1f)
+            {
+                isFinalRotating = false;
+                isReturning = true;
+                stateTimer = 0f;
+                moveStartPosition = transform.position;
                 Debug.Log("Final rotation complete, returning to start");
             }
         }
         else if (isReturning)
         {
-            // Return to start position
+            // Return to start position from trigger position
             stateTimer += Time.deltaTime;
             float t = stateTimer / returnMovementDuration;
-            transform.position = Vector3.Lerp(snapPosition, startPosition, t);
+            transform.position = Vector3.Lerp(moveStartPosition, startPosition, t); // Use moveStartPosition instead of snapPosition
 
             if (t >= 1f)
             {
@@ -184,12 +221,13 @@ public class DragMixingStick : MonoBehaviour
             if (distanceToSnap < snapDistance)
             {
                 isDragging = false;
-                isMovingToSnap = true;
+                isInitialRotating = true; // Start with rotation instead of moving
                 stateTimer = 0f;
+                triggerPosition = transform.position; // Store the position where snapping triggered
                 moveStartPosition = transform.position;
                 snapPosition = snapPoint.position;
                 startRotation = transform.rotation;
-                Debug.Log($"Starting movement to snap point with Y offset: {snapYOffset}");
+                Debug.Log("Starting initial rotation before snap movement");
             }
         }
     }

@@ -1140,6 +1140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snapPoint: {fileID: 870126251}
   porridgeScript: {fileID: 1343172452}
+  stirredPorridgeSprite: {fileID: 3157134313574934939, guid: f9c94ddbe77573745a46a4c047067222, type: 3}
   snapDistance: 5
   snapYOffset: 0.5
   rotationSpeed: 300

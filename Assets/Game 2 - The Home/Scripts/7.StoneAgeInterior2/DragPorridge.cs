@@ -119,4 +119,15 @@ public class DragPorridge : MonoBehaviour
     {
         return isSnapped;
     }
+
+    public SpriteRenderer GetPorridgeRenderer()
+    {
+        return porridgeObject?.GetComponent<SpriteRenderer>();
+    }
+
+    public void LockSnapping()
+    {
+        isSnapped = true; // This prevents further snapping
+        Debug.Log("Circle 1 snapping locked");
+    }
 }
