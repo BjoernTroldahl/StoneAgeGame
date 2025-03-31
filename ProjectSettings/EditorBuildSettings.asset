@@ -32,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game 2 - The Home/Scenes/6.StoneAgeInteriorArea2.unity
     guid: 4ea66e4d571c80f4d8977a0002cc4cff
+  - enabled: 1
+    path: Assets/Game 2 - The Home/Scenes/7.Hearth.unity
+    guid: 627900ff48ec2984c8c32068398c75fd
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

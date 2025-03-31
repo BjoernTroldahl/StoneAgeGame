@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ArrowSign : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class ArrowSign : MonoBehaviour
         if (gameObject.activeSelf)
         {
             Debug.Log("CONGRATS YOU WON THE LEVEL");
+            SceneManager.LoadScene(8);
         }
     }
 }
