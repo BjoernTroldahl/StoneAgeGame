@@ -1,10 +1,14 @@
 using UnityEngine;
+using System.Collections;
 
 public class DragMilkVessel : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform circle1;
-    [SerializeField] private Sprite milkedVesselSprite;  // Add new sprite reference
+    [SerializeField] private Sprite milkedVesselSprite;
+    [SerializeField] private GameObject cow;               // Changed to GameObject
+    [SerializeField] private Sprite cowIdleSprite;
+    [SerializeField] private Sprite cowMilkingSprite;
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -15,6 +19,7 @@ public class DragMilkVessel : MonoBehaviour
     private Vector3 offset;
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;  // Add sprite renderer reference
+    private BoxCollider2D cowCollider;
 
     void Start()
     {
@@ -30,6 +35,15 @@ public class DragMilkVessel : MonoBehaviour
         {
             Debug.LogError("Sprite Renderer not found!");
             return;
+        }
+        
+        if (cow != null)
+        {
+            cowCollider = cow.GetComponent<BoxCollider2D>();
+            if (cowCollider != null)
+            {
+                cowCollider.enabled = false; // Disable cow collider at start
+            }
         }
     }
 
@@ -52,22 +66,20 @@ public class DragMilkVessel : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!isMilked)
-        {
-            if (spriteRenderer != null && milkedVesselSprite != null)
-            {
-                spriteRenderer.sprite = milkedVesselSprite;
-                isMilked = true;
-                Debug.Log("Vessel milked - Ready for transport");
-            }
-            return;
-        }
-
-        if (!isSnapped && isMilked)
+        // Allow initial dragging without being milked
+        if (!isSnapped)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
+
+            // Change vessel sprite immediately when dragged
+            if (spriteRenderer != null && milkedVesselSprite != null)
+            {
+                spriteRenderer.sprite = milkedVesselSprite;
+                Debug.Log("Vessel sprite changed on drag");
+            }
+            return;
         }
     }
 
@@ -81,14 +93,58 @@ public class DragMilkVessel : MonoBehaviour
         transform.position = circle1.position;
         isSnapped = true;
         isDragging = false;
+        
+        // Enable cow collider when vessel snaps
+        if (cowCollider != null)
+        {
+            cowCollider.enabled = true;
+            Debug.Log("Cow interaction enabled");
+        }
+        
+        Debug.Log("Milk vessel snapped to circle");
+    }
 
-        // Change sprite when snapped
+    // Add separate script for cow click handling
+    public void OnCowClicked()
+    {
+        if (isSnapped && !isMilked)
+        {
+            StartCoroutine(MilkCowAnimation());
+            Debug.Log("Starting cow milking sequence");
+        }
+        else
+        {
+            Debug.Log($"Cow click ignored - Snapped: {isSnapped}, Milked: {isMilked}");
+        }
+    }
+
+    // Modify MilkCowAnimation to set the state after animation
+    private IEnumerator MilkCowAnimation()
+    {
+        SpriteRenderer cowRenderer = cow.GetComponent<SpriteRenderer>();
+        if (cowRenderer == null)
+        {
+            Debug.LogError("No SpriteRenderer found on cow!");
+            yield break;
+        }
+
+        // Change to milking sprite
+        cowRenderer.sprite = cowMilkingSprite;
+        Debug.Log("Cow milking animation started");
+        
+        // Wait for half a second
+        yield return new WaitForSeconds(0.5f);
+        
+        // Change back to idle sprite
+        cowRenderer.sprite = cowIdleSprite;
+        
+        // Set milked state and change vessel sprite after animation
+        isMilked = true;
         if (spriteRenderer != null && milkedVesselSprite != null)
         {
             spriteRenderer.sprite = milkedVesselSprite;
-            Debug.Log("Changed to milked vessel sprite");
         }
-
-        Debug.Log("Milk vessel snapped to circle");
+        
+        Debug.Log("Milking complete - Vessel filled");
     }
 }
