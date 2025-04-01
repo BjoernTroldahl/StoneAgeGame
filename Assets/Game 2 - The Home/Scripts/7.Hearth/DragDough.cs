@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class DragDough : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class DragDough : MonoBehaviour
     [SerializeField] private Sprite breadHalfSprite;
     [SerializeField] private Sprite breadFinishedSprite;
     [SerializeField] private Vector3 spawnPosition;
-    [SerializeField] private SpriteRenderer backgroundImage;
+    [SerializeField] private Image backgroundImage;
     [SerializeField] private Sprite backgroundNoDoughSprite;
     [SerializeField] private SpriteRenderer arrowSign;
 
@@ -118,6 +120,7 @@ public class DragDough : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
             {
                 Debug.Log("CONGRATS YOU BEAT THE LEVEL");
+                SceneManager.LoadScene(9); // Load the next level
             }
         }
     }
@@ -235,7 +238,7 @@ public class DragDough : MonoBehaviour
         Transform s1, Transform s2, Transform s3, Transform s4, Transform s5,
         GameObject prefab, Vector3 spawn, 
         Sprite halfSprite, Sprite finishedSprite,
-        SpriteRenderer background, Sprite noDoughSprite,
+        Image background, Sprite noDoughSprite,
         SpriteRenderer arrow)
     {
         circle1 = c1;

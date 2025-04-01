@@ -35,6 +35,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game 2 - The Home/Scenes/7.Hearth.unity
     guid: 627900ff48ec2984c8c32068398c75fd
+  - enabled: 1
+    path: Assets/Game 2 - The Home/Scenes/8.AnimalShelter.unity
+    guid: 390f099204a99d8488e7cc4aac2bdf9f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
