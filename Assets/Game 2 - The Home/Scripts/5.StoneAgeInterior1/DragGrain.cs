@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class DragGrain : MonoBehaviour
 {
@@ -12,6 +13,10 @@ public class DragGrain : MonoBehaviour
     [SerializeField] private SpriteRenderer arrowSign;
     [SerializeField] private GameObject grainPrefab;  // Add grain prefab
     [SerializeField] private Vector3 spawnPosition;   // Add spawn position
+
+    [Header("Cloning")]
+    [SerializeField] private bool isOriginal = true; // Flag to identify original grain
+    [SerializeField] private float cloneOffsetX = 0.5f; // Horizontal offset for the clone
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -27,30 +32,79 @@ public class DragGrain : MonoBehaviour
     private bool isSnappedToCircle1 = false;
     private bool isSnappedToCircle2 = false;
     private bool isMillingComplete = false;
+    private bool canDragAfterMilling = false; // Indicates if user has clicked on grain after milling
+    //private bool waitingForPostMillingClick = false; // New flag to track post-milling click state
     private int flipCounter = 0;
     private BoxCollider2D millstoneCollider;
     private SpriteRenderer grainRenderer;
+    private BoxCollider2D grainCollider; // Add reference to own collider
 
+    // Static variables to track game state
     private static bool isSecondGrain = false;  // Track if this is the second grain
     private static bool firstGrainComplete = false;  // Track if first grain is done
+    private static bool secondGrainComplete = false;  // Track if second grain is done
+    private static bool isAnyGrainBeingDragged = false; // NEW: Track if any grain is currently being dragged
+    private static DragGrain activeDraggedGrain = null; // NEW: Reference to the grain currently being dragged
+    private static SpriteRenderer sharedArrowSign = null; // NEW: Static reference to arrow
+    private static bool isCircle2Occupied = false; // Track if Circle 2 is occupied
+    private static bool isCircle3Occupied = false; // Track if Circle 3 is occupied
 
     void Start()
     {
         mainCamera = Camera.main;
         grainRenderer = GetComponent<SpriteRenderer>();
         millstoneCollider = millstone.GetComponent<BoxCollider2D>();
+        grainCollider = GetComponent<BoxCollider2D>(); // Get own collider reference
 
         // Hide millstone and arrow at start
         millstone.enabled = false;
         millstoneCollider.enabled = false;
-        arrowSign.enabled = false;
+        
+        // Handle the arrow sign reference differently for original vs clone
+        if (isOriginal && arrowSign != null)
+        {
+            // For original grain, store the reference to the static variable
+            sharedArrowSign = arrowSign;
+            sharedArrowSign.enabled = false;
+            Debug.Log("Arrow sign hidden at start and stored as shared reference");
+        }
+        else if (!isOriginal)
+        {
+            // Cloned grain doesn't need its own arrow reference
+            // It will use the static sharedArrowSign instead
+            Debug.Log("Cloned grain will use shared arrow reference");
+        }
+        else if (isOriginal && arrowSign == null)
+        {
+            // Only show error for original grain with missing reference
+            Debug.LogError("Arrow sign reference is missing on original grain!");
+        }
 
         lastClickTime = 0f;
+        
+        // Spawn the second grain at start if this is the original
+        if (isOriginal && grainPrefab != null)
+        {
+            SpawnSecondGrainAtStart();
+        }
+
+        // Reset static dragging variables on start
+        if (isOriginal)
+        {
+            isAnyGrainBeingDragged = false;
+            activeDraggedGrain = null;
+            firstGrainComplete = false;
+            secondGrainComplete = false;
+            isCircle2Occupied = false;
+            isCircle3Occupied = false;
+        }
     }
 
     void Update()
     {
-        if (isDragging && !isSnappedToCircle2)
+        // Only process dragging if explicitly allowed AND no other grain is being dragged (or this is the active one)
+        if (isDragging && (!isMillingComplete || canDragAfterMilling) && !isSnappedToCircle2 && 
+            (activeDraggedGrain == this || !isAnyGrainBeingDragged))
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             Vector3 newPosition = new Vector3(mousePosition.x + offset.x, mousePosition.y + offset.y, transform.position.z);
@@ -67,19 +121,19 @@ public class DragGrain : MonoBehaviour
             }
 
             // Check for final position snap if milling is complete
-            if (isMillingComplete)
+            if (isMillingComplete && canDragAfterMilling)
             {
-                Transform targetCircle = isSecondGrain ? circle3 : circle2;
-                if (Vector2.Distance(newPosition, targetCircle.position) < snapDistance)
+                // Check for Circle 2 snap (for both grains)
+                if (Vector2.Distance(newPosition, circle2.position) < snapDistance)
                 {
-                    if (isSecondGrain)
-                    {
-                        SnapToCircle3();
-                    }
-                    else
-                    {
-                        SnapToCircle2();
-                    }
+                    SnapToCircle2();
+                    return;
+                }
+                
+                // Check for Circle 3 snap (for both grains)
+                if (Vector2.Distance(newPosition, circle3.position) < snapDistance)
+                {
+                    SnapToCircle3();
                     return;
                 }
             }
@@ -102,13 +156,15 @@ public class DragGrain : MonoBehaviour
             }
         }
 
-        // Modify arrow clicking to only work after second grain is complete
-        if (isSnappedToCircle2 && firstGrainComplete && Input.GetMouseButtonDown(0))
+        // Handle arrow clicking - only works when both circles are occupied
+        if (sharedArrowSign != null && sharedArrowSign.enabled && Input.GetMouseButtonDown(0))
         {
             Vector2 clickPosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(clickPosition, Vector2.zero);
-
-            if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
+            
+            Debug.Log($"Arrow click attempt - hit collider: {(hit.collider != null ? hit.collider.name : "none")}");
+            
+            if (hit.collider != null && hit.collider.gameObject == sharedArrowSign.gameObject)
             {
                 Debug.Log("CONGRATS YOU WON THE LEVEL");
                 SceneManager.LoadScene(7);
@@ -120,6 +176,14 @@ public class DragGrain : MonoBehaviour
     {
         millstone.enabled = true;
         millstoneCollider.enabled = true;
+        
+        // Disable grain's collider while milling
+        if (grainCollider != null)
+        {
+            grainCollider.enabled = false;
+            Debug.Log("Grain collider disabled during milling");
+        }
+        
         Debug.Log("Millstone activated");
     }
 
@@ -140,9 +204,26 @@ public class DragGrain : MonoBehaviour
         isMillingComplete = true;
         millstone.enabled = false;
         millstoneCollider.enabled = false;
+        
+        // Set flour sprite and flip it horizontally
         grainRenderer.sprite = flourSprite;
-        isDragging = true;
-        Debug.Log("Milling complete - Converting to flour");
+        grainRenderer.flipX = true;  // Flip the flour sprite horizontally
+        
+        // Re-enable grain's collider after milling is complete
+        if (grainCollider != null)
+        {
+            grainCollider.enabled = true;
+            Debug.Log("Grain collider re-enabled after milling");
+        }
+        
+        // Release the dragging lock momentarily to allow re-clicking
+        isDragging = false;
+        isAnyGrainBeingDragged = false;
+        activeDraggedGrain = null;
+        
+        canDragAfterMilling = true;
+        
+        Debug.Log("Milling complete - Flour ready to be dragged (with flipped sprite)");
     }
 
     private void SnapToCircle2()
@@ -150,15 +231,18 @@ public class DragGrain : MonoBehaviour
         transform.position = circle2.position;
         isSnappedToCircle2 = true;
         isDragging = false;
-        firstGrainComplete = true;
-
-        // Spawn second grain
-        if (!isSecondGrain)
-        {
-            SpawnSecondGrain();
-        }
         
-        Debug.Log("First grain snapped to Circle 2");
+        // Release the dragging lock when snapped
+        isAnyGrainBeingDragged = false;
+        activeDraggedGrain = null;
+        
+        // Mark Circle 2 as occupied
+        isCircle2Occupied = true;
+        
+        // Check if both circles are now occupied
+        CheckCirclesOccupation();
+        
+        Debug.Log($"Grain [{name}] snapped to Circle 2");
     }
 
     private void SnapToCircle3()
@@ -166,22 +250,119 @@ public class DragGrain : MonoBehaviour
         transform.position = circle3.position;
         isSnappedToCircle2 = true;  // Reuse this flag for completion state
         isDragging = false;
-        arrowSign.enabled = true;  // Only enable arrow after second grain is complete
-        Debug.Log("Second grain snapped to Circle 3 - Arrow sign enabled");
+        
+        // Release the dragging lock when snapped
+        isAnyGrainBeingDragged = false;
+        activeDraggedGrain = null;
+        
+        // Mark Circle 3 as occupied
+        isCircle3Occupied = true;
+        
+        // Check if both circles are now occupied
+        CheckCirclesOccupation();
+        
+        Debug.Log($"Grain [{name}] snapped to Circle 3");
     }
 
-    private void SpawnSecondGrain()
+    // New method to track completion of both flours
+    private void CheckBothFloursComplete()
     {
-        if (grainPrefab != null)
+        Debug.Log($"Checking completion - First grain: {firstGrainComplete}, Second grain: {secondGrainComplete}");
+        
+        // Check if both grains are complete - enable arrow only then
+        if (firstGrainComplete && secondGrainComplete)
         {
-            GameObject newGrain = Instantiate(grainPrefab, spawnPosition, Quaternion.identity);
-            DragGrain newGrainScript = newGrain.GetComponent<DragGrain>();
-            if (newGrainScript != null)
+            // Use the shared static arrow reference
+            if (sharedArrowSign != null)
             {
-                newGrainScript.SetAsSecondGrain();
+                sharedArrowSign.enabled = true;
+                sharedArrowSign.gameObject.SetActive(true); // Also activate the GameObject
+                
+                // Make sure arrow has a BoxCollider2D for clicking
+                BoxCollider2D arrowCollider = sharedArrowSign.GetComponent<BoxCollider2D>();
+                if (arrowCollider != null)
+                {
+                    arrowCollider.enabled = true;
+                }
+                else
+                {
+                    Debug.LogWarning("Arrow has no BoxCollider2D - add one for clicking!");
+                }
+                
+                // Explicitly set color to fully opaque
+                Color color = sharedArrowSign.color;
+                sharedArrowSign.color = new Color(color.r, color.g, color.b, 1.0f);
+                
+                Debug.Log("Both flours complete - SHARED Arrow sign enabled and made visible!");
             }
-            Debug.Log("Spawned second grain");
+            else
+            {
+                Debug.LogError("Shared arrow sign reference is null! Check inspector assignment.");
+            }
         }
+        else
+        {
+            if (sharedArrowSign != null)
+            {
+                sharedArrowSign.enabled = false;
+                Debug.Log($"Not all flours complete yet - Arrow hidden");
+            }
+        }
+    }
+
+    // New method to check if both circles are occupied
+    private void CheckCirclesOccupation()
+    {
+        Debug.Log($"Checking circle occupation - Circle2: {isCircle2Occupied}, Circle3: {isCircle3Occupied}");
+        
+        // Only enable the arrow when both circles are occupied
+        if (isCircle2Occupied && isCircle3Occupied)
+        {
+            if (sharedArrowSign != null)
+            {
+                // Make the arrow visible and interactive
+                sharedArrowSign.enabled = true;
+                sharedArrowSign.gameObject.SetActive(true);
+                
+                // Make sure the arrow collider is enabled
+                BoxCollider2D arrowCollider = sharedArrowSign.GetComponent<BoxCollider2D>();
+                if (arrowCollider != null)
+                {
+                    arrowCollider.enabled = true;
+                }
+                
+                Debug.Log("BOTH CIRCLES OCCUPIED - Arrow sign enabled!");
+            }
+            else
+            {
+                Debug.LogError("Cannot enable arrow - shared reference is null!");
+            }
+        }
+    }
+
+    // New method to spawn the second grain at start
+    private void SpawnSecondGrainAtStart()
+    {
+        // Calculate position with offset
+        Vector3 clonePosition = transform.position + new Vector3(cloneOffsetX, 0, 0);
+        
+        GameObject newGrain = Instantiate(grainPrefab, clonePosition, Quaternion.identity);
+        DragGrain newGrainScript = newGrain.GetComponent<DragGrain>();
+        if (newGrainScript != null)
+        {
+            newGrainScript.SetAsSecondGrain();
+            newGrainScript.SetAsNonOriginal(); // Mark as non-original to prevent spawning more grains
+        }
+        Debug.Log("Second grain spawned at start");
+    }
+    
+    // Add method to set as non-original
+    public void SetAsNonOriginal()
+    {
+        isOriginal = false;
+        
+        // Clone doesn't need its own arrow reference
+        arrowSign = null;
     }
 
     public void SetAsSecondGrain()
@@ -191,16 +372,42 @@ public class DragGrain : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!isSnappedToCircle2)
+        // Only allow dragging if: 
+        // 1. Not in final position
+        // 2. Properly initialized for dragging
+        // 3. No other grain is being dragged OR this grain was already being dragged
+        if (!isSnappedToCircle2 && (!isMillingComplete || canDragAfterMilling) && 
+            (!isAnyGrainBeingDragged || activeDraggedGrain == this))
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
+            
+            // Mark this grain as the active dragged one
+            isAnyGrainBeingDragged = true;
+            activeDraggedGrain = this;
+            
+            Debug.Log($"Started dragging grain [{name}] - isMillingComplete: {isMillingComplete}");
+        }
+        else if (isAnyGrainBeingDragged && activeDraggedGrain != this)
+        {
+            Debug.Log($"Cannot drag grain [{name}] - Another grain is being dragged");
         }
     }
 
     private void OnMouseUp()
     {
-        isDragging = false;
+        if (isDragging)
+        {
+            isDragging = false;
+            
+            // Only release the global lock if this grain is done (or if it's not the active one)
+            if (isSnappedToCircle2 || activeDraggedGrain != this)
+            {
+                isAnyGrainBeingDragged = false;
+                activeDraggedGrain = null;
+                Debug.Log($"Released dragging lock - grain [{name}] is done or no longer active");
+            }
+        }
     }
 }

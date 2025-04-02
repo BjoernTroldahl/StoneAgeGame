@@ -904,7 +904,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1756534544}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -941,7 +941,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 5.06, y: 4.83}
+  m_Size: {x: 4.5, y: 4.27}
   m_EdgeRadius: 0
 --- !u!1 &1954540147
 GameObject:
@@ -1014,7 +1014,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1954540147}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -1104,7 +1104,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 694635941382614935, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.79
+      value: 11.4
       objectReference: {fileID: 0}
     - target: {fileID: 694635941382614935, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1190,6 +1190,10 @@ PrefabInstance:
       propertyPath: grainPrefab
       value: 
       objectReference: {fileID: 2309708728807568217}
+    - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
+      propertyPath: cloneOffsetX
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
       propertyPath: millingStone
       value: 
