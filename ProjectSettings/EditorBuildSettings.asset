@@ -38,6 +38,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game 2 - The Home/Scenes/8.AnimalShelter.unity
     guid: 390f099204a99d8488e7cc4aac2bdf9f
+  - enabled: 1
+    path: Assets/Game 2 - The Home/Scenes/EndScreen2.unity
+    guid: f05b1a8a5d7c1b54b840f1392b5929ff
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class DragMilkVessel : MonoBehaviour
 {
@@ -298,6 +299,7 @@ public class DragMilkVessel : MonoBehaviour
             Debug.Log("*************************************************");
             Debug.Log("*************** CONGRATS! YOU WON ***************");
             Debug.Log("*************************************************");
+            SceneManager.LoadScene(10); // Load the win scene
             
             // You could add additional effects here
         }
