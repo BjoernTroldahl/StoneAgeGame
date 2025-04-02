@@ -28,6 +28,8 @@ public class DragMilkVessel : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
     [SerializeField] private float milkingAnimationDuration = 0.5f;
+    [SerializeField] private int defaultSortingOrder = 0;   // Default order in layer 
+    [SerializeField] private int dragSortingOrder = 4;      // Order in layer when dragging
 
     private bool isDragging = false;
     private bool isSnapped = false;
@@ -141,6 +143,13 @@ public class DragMilkVessel : MonoBehaviour
             isDragging = true;
             isSnapped = false; // Unsnap immediately
             
+            // Increase sorting order when dragging
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingOrder = dragSortingOrder;
+                Debug.Log($"Vessel [{name}] sorting order set to {dragSortingOrder} while dragging");
+            }
+            
             // Free target if this was occupying it
             if (isTargetOccupied && occupyingVessel == this)
             {
@@ -167,6 +176,13 @@ public class DragMilkVessel : MonoBehaviour
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
+            
+            // Increase sorting order when dragging
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingOrder = dragSortingOrder;
+                Debug.Log($"Vessel [{name}] sorting order set to {dragSortingOrder} while dragging");
+            }
             
             if (milkLevel == 0 && spriteRenderer != null && milkedVesselSprite != null)
             {
@@ -212,6 +228,13 @@ public class DragMilkVessel : MonoBehaviour
         transform.position = circleTransform.position;
         isSnapped = true;
         isDragging = false;
+        
+        // Reset sorting order when snapped
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = defaultSortingOrder;
+            Debug.Log($"Vessel [{name}] sorting order reset to {defaultSortingOrder} after snapping");
+        }
         
         if (circleNumber == 1)
         {
