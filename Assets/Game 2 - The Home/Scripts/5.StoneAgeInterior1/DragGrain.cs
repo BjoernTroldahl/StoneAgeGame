@@ -49,6 +49,11 @@ public class DragGrain : MonoBehaviour
     private static bool isCircle2Occupied = false; // Track if Circle 2 is occupied
     private static bool isCircle3Occupied = false; // Track if Circle 3 is occupied
     private static bool hasResetStaticVars = false;  // Add flag to track if we've reset vars this scene load
+    // Add a static flag to track if the first grain is fully complete
+    private static bool isFirstGrainFullyComplete = false;
+    
+    // Add field to store original sorting order
+    private int defaultSortingOrder;
 
     void Start()
     {
@@ -56,6 +61,9 @@ public class DragGrain : MonoBehaviour
         grainRenderer = GetComponent<SpriteRenderer>();
         millstoneCollider = millstone.GetComponent<BoxCollider2D>();
         grainCollider = GetComponent<BoxCollider2D>(); // Get own collider reference
+        
+        // Store default sorting order
+        defaultSortingOrder = grainRenderer.sortingOrder;
 
         // Reset all static variables when the scene is first loaded (only once per scene load)
         if (isOriginal && !hasResetStaticVars)
@@ -80,6 +88,13 @@ public class DragGrain : MonoBehaviour
             // Cloned grain doesn't need its own arrow reference
             // It will use the static sharedArrowSign instead
             Debug.Log("Cloned grain will use shared arrow reference");
+            
+            // Disable the clone's collider until first grain is complete
+            if (grainCollider != null)
+            {
+                grainCollider.enabled = false;
+                Debug.Log("Second grain collider disabled until first grain is complete");
+            }
         }
         else if (isOriginal && arrowSign == null)
         {
@@ -107,8 +122,16 @@ public class DragGrain : MonoBehaviour
         }
     }
 
+    // Update each frame to check if second grain should be draggable
     void Update()
     {
+        // Enable second grain's collider once first grain is complete
+        if (!isOriginal && !grainCollider.enabled && isFirstGrainFullyComplete)
+        {
+            grainCollider.enabled = true;
+            Debug.Log("Second grain collider enabled - now draggable");
+        }
+        
         // Only process dragging if explicitly allowed AND no other grain is being dragged (or this is the active one)
         if (isDragging && (!isMillingComplete || canDragAfterMilling) && !isSnappedToCircle2 && 
             (activeDraggedGrain == this || !isAnyGrainBeingDragged))
@@ -246,6 +269,16 @@ public class DragGrain : MonoBehaviour
         // Mark Circle 2 as occupied
         isCircle2Occupied = true;
         
+        // If this is the original grain, mark first grain as fully complete
+        if (isOriginal)
+        {
+            isFirstGrainFullyComplete = true;
+            Debug.Log("First grain fully complete - second grain can now be dragged");
+            
+            // No need to explicitly enable second grain collider here,
+            // the Update method will handle that
+        }
+        
         // Check if both circles are now occupied
         CheckCirclesOccupation();
         
@@ -264,6 +297,13 @@ public class DragGrain : MonoBehaviour
         
         // Mark Circle 3 as occupied
         isCircle3Occupied = true;
+        
+        // If this is the original grain, mark first grain as fully complete
+        if (isOriginal)
+        {
+            isFirstGrainFullyComplete = true;
+            Debug.Log("First grain fully complete - second grain can now be dragged");
+        }
         
         // Check if both circles are now occupied
         CheckCirclesOccupation();
@@ -369,6 +409,13 @@ public class DragGrain : MonoBehaviour
         
         // Clone doesn't need its own arrow reference
         arrowSign = null;
+        
+        // Set sorting order for non-original grain lower
+        if (grainRenderer != null)
+        {
+            grainRenderer.sortingOrder = defaultSortingOrder - 1;
+            Debug.Log("Second grain set to lower sorting order");
+        }
     }
 
     // New static method to reset all static variables
@@ -380,6 +427,7 @@ public class DragGrain : MonoBehaviour
         activeDraggedGrain = null;
         isCircle2Occupied = false;
         isCircle3Occupied = false;
+        isFirstGrainFullyComplete = false; // Reset the flag
         hasResetStaticVars = true;  // Mark as reset for this scene load
         
         Debug.Log("All static variables have been reset for new game");
@@ -387,6 +435,13 @@ public class DragGrain : MonoBehaviour
 
     private void OnMouseDown()
     {
+        // For the second (non-original) grain, only allow dragging if the first grain is fully complete
+        if (!isOriginal && !isFirstGrainFullyComplete)
+        {
+            Debug.Log("Cannot drag second grain until first grain is fully complete");
+            return;
+        }
+
         // Only allow dragging if: 
         // 1. Not in final position
         // 2. Properly initialized for dragging
@@ -402,6 +457,9 @@ public class DragGrain : MonoBehaviour
             isAnyGrainBeingDragged = true;
             activeDraggedGrain = this;
             
+            // Increase sorting order while dragging to appear on top
+            grainRenderer.sortingOrder = defaultSortingOrder + 2;
+            
             Debug.Log($"Started dragging grain [{name}] - isMillingComplete: {isMillingComplete}");
         }
         else if (isAnyGrainBeingDragged && activeDraggedGrain != this)
@@ -415,6 +473,9 @@ public class DragGrain : MonoBehaviour
         if (isDragging)
         {
             isDragging = false;
+            
+            // Reset the sorting order
+            grainRenderer.sortingOrder = defaultSortingOrder;
             
             // Only release the global lock if this grain is done (or if it's not the active one)
             if (isSnappedToCircle2 || activeDraggedGrain != this)

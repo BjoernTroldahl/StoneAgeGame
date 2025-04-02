@@ -979,7 +979,7 @@ MonoBehaviour:
   circle3: {fileID: 529889084}
   circle4: {fileID: 1664538703}
   vesselPrefab: {fileID: 1446918330}
-  snapDistance: 5
+  snapDistance: 3
   milkingAnimationDuration: 0.5
   defaultSortingOrder: 0
   dragSortingOrder: 4
