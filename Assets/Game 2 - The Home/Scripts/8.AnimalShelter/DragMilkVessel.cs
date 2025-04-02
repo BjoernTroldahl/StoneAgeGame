@@ -4,8 +4,11 @@ public class DragMilkVessel : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform circle1;
-    [SerializeField] private Sprite milkedVesselSprite;  // Original milk sprite
-    [SerializeField] private Sprite milk1Sprite;         // Add new sprite reference
+    [SerializeField] private Transform circle2;           // Add second circle reference
+    [SerializeField] private Sprite milkedVesselSprite;   // Empty vessel sprite
+    [SerializeField] private Sprite milk1Sprite;          // First level milk sprite
+    [SerializeField] private Sprite milk2Sprite;          // Second level milk sprite
+    [SerializeField] private Sprite milk3Sprite;          // Third level milk sprite (add this)
     [SerializeField] private GameObject cow;
     [SerializeField] private Sprite cowIdleSprite;
     [SerializeField] private Sprite cowMilkingSprite;
@@ -22,6 +25,7 @@ public class DragMilkVessel : MonoBehaviour
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;  // Add sprite renderer reference
     private BoxCollider2D cowCollider;
+    private int milkLevel = 0;  // Track milk level counter
 
     void Start()
     {
@@ -73,25 +77,37 @@ public class DragMilkVessel : MonoBehaviour
                                           mousePosition.y + offset.y, 
                                           transform.position.z);
 
-            // Check for snapping distance
-            if (Vector2.Distance(transform.position, circle1.position) < snapDistance)
+            // Check for circle1 snapping only when not milked fully
+            if (milkLevel < 3 && Vector2.Distance(transform.position, circle1.position) < snapDistance)
             {
-                SnapToCircle();
+                SnapToCircle(circle1, 1);
+            }
+            // Check for circle2 snapping only when fully milked
+            else if (milkLevel >= 3 && Vector2.Distance(transform.position, circle2.position) < snapDistance)
+            {
+                SnapToCircle(circle2, 2);
             }
         }
     }
 
     private void OnMouseDown()
     {
-        // Allow initial dragging without being milked
-        if (!isSnapped)
+        // Allow dragging after fully milked or if not snapped
+        if ((milkLevel >= 3 && isSnapped) || !isSnapped)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
-
-            // Change vessel sprite immediately when dragged
-            if (spriteRenderer != null && milkedVesselSprite != null)
+            
+            // Reset snapped state if fully milked and was previously snapped
+            if (milkLevel >= 3 && isSnapped)
+            {
+                isSnapped = false;
+                Debug.Log("Vessel ready for final placement");
+            }
+            
+            // Only change sprite if it's first being picked up (not milk level 3)
+            if (milkLevel == 0 && spriteRenderer != null && milkedVesselSprite != null)
             {
                 spriteRenderer.sprite = milkedVesselSprite;
                 Debug.Log("Vessel sprite changed on drag");
@@ -105,33 +121,39 @@ public class DragMilkVessel : MonoBehaviour
         isDragging = false;
     }
 
-    private void SnapToCircle()
-    {
-        transform.position = circle1.position;
-        isSnapped = true;
-        isDragging = false;
-        
-        // Enable cow collider when vessel snaps
-        if (cowCollider != null)
-        {
-            cowCollider.enabled = true;
-            Debug.Log("Cow interaction enabled");
-        }
-        
-        Debug.Log("Milk vessel snapped to circle");
-    }
-
-    // Add separate script for cow click handling
     public void OnCowClicked()
     {
-        if (isSnapped && !isMilked)
+        if (isSnapped && milkLevel < 3)  // Allow up to 3 milk levels
         {
             StartCoroutine(MilkCowAnimation());
-            Debug.Log("Starting cow milking sequence");
+            Debug.Log($"Starting cow milking sequence - Current milk level: {milkLevel}");
         }
         else
         {
-            Debug.Log($"Cow click ignored - Snapped: {isSnapped}, Milked: {isMilked}");
+            Debug.Log($"Cow click ignored - Snapped: {isSnapped}, Milk Level: {milkLevel}");
+        }
+    }
+
+    private void SnapToCircle(Transform circleTransform, int circleNumber)
+    {
+        transform.position = circleTransform.position;
+        isSnapped = true;
+        isDragging = false;
+        
+        if (circleNumber == 1)
+        {
+            // Enable cow collider only when snapped to first circle
+            if (cowCollider != null)
+            {
+                cowCollider.enabled = true;
+                Debug.Log("Cow interaction enabled");
+            }
+            Debug.Log("Milk vessel snapped to circle 1");
+        }
+        else if (circleNumber == 2)
+        {
+            Debug.Log("Filled vessel placed in final position!");
+            // Here you could trigger game progression or other events
         }
     }
 
@@ -162,18 +184,33 @@ public class DragMilkVessel : MonoBehaviour
         // Change back to idle sprite
         cowRenderer.sprite = cowIdleSprite;
         
-        // We don't need to set the sprite here anymore since it will be done by the droplet callback
+        // Set milked state but don't change sprite yet
         isMilked = true;
         
-        Debug.Log($"Milking complete after {milkingAnimationDuration} seconds - Vessel filled");
+        Debug.Log($"Milking complete after {milkingAnimationDuration} seconds");
     }
 
     private void OnDropletAnimationComplete()
     {
-        if (spriteRenderer != null && milk1Sprite != null)
+        milkLevel++;
+        
+        if (spriteRenderer != null)
         {
-            spriteRenderer.sprite = milk1Sprite;
-            Debug.Log("Vessel filled with milk");
+            if (milkLevel == 1 && milk1Sprite != null)
+            {
+                spriteRenderer.sprite = milk1Sprite;
+                Debug.Log("Vessel filled to level 1");
+            }
+            else if (milkLevel == 2 && milk2Sprite != null)
+            {
+                spriteRenderer.sprite = milk2Sprite;
+                Debug.Log("Vessel filled to level 2");
+            }
+            else if (milkLevel == 3 && milk3Sprite != null)
+            {
+                spriteRenderer.sprite = milk3Sprite;
+                Debug.Log("Vessel filled to level 3 (maximum) - Ready for final placement");
+            }
         }
     }
 }
