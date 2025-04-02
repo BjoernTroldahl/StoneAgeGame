@@ -40,7 +40,7 @@ public class DragGrain : MonoBehaviour
     private BoxCollider2D grainCollider; // Add reference to own collider
 
     // Static variables to track game state
-    private static bool isSecondGrain = false;  // Track if this is the second grain
+    //private static bool isSecondGrain = false;  // Track if this is the second grain
     private static bool firstGrainComplete = false;  // Track if first grain is done
     private static bool secondGrainComplete = false;  // Track if second grain is done
     private static bool isAnyGrainBeingDragged = false; // NEW: Track if any grain is currently being dragged
@@ -350,7 +350,6 @@ public class DragGrain : MonoBehaviour
         DragGrain newGrainScript = newGrain.GetComponent<DragGrain>();
         if (newGrainScript != null)
         {
-            newGrainScript.SetAsSecondGrain();
             newGrainScript.SetAsNonOriginal(); // Mark as non-original to prevent spawning more grains
         }
         Debug.Log("Second grain spawned at start");
@@ -363,11 +362,6 @@ public class DragGrain : MonoBehaviour
         
         // Clone doesn't need its own arrow reference
         arrowSign = null;
-    }
-
-    public void SetAsSecondGrain()
-    {
-        isSecondGrain = true;
     }
 
     private void OnMouseDown()
