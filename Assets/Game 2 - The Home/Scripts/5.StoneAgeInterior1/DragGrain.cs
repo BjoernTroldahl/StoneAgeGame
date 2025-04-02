@@ -48,6 +48,7 @@ public class DragGrain : MonoBehaviour
     private static SpriteRenderer sharedArrowSign = null; // NEW: Static reference to arrow
     private static bool isCircle2Occupied = false; // Track if Circle 2 is occupied
     private static bool isCircle3Occupied = false; // Track if Circle 3 is occupied
+    private static bool hasResetStaticVars = false;  // Add flag to track if we've reset vars this scene load
 
     void Start()
     {
@@ -55,6 +56,12 @@ public class DragGrain : MonoBehaviour
         grainRenderer = GetComponent<SpriteRenderer>();
         millstoneCollider = millstone.GetComponent<BoxCollider2D>();
         grainCollider = GetComponent<BoxCollider2D>(); // Get own collider reference
+
+        // Reset all static variables when the scene is first loaded (only once per scene load)
+        if (isOriginal && !hasResetStaticVars)
+        {
+            ResetAllStaticVariables();
+        }
 
         // Hide millstone and arrow at start
         millstone.enabled = false;
@@ -364,6 +371,20 @@ public class DragGrain : MonoBehaviour
         arrowSign = null;
     }
 
+    // New static method to reset all static variables
+    private static void ResetAllStaticVariables()
+    {
+        firstGrainComplete = false;
+        secondGrainComplete = false;
+        isAnyGrainBeingDragged = false;
+        activeDraggedGrain = null;
+        isCircle2Occupied = false;
+        isCircle3Occupied = false;
+        hasResetStaticVars = true;  // Mark as reset for this scene load
+        
+        Debug.Log("All static variables have been reset for new game");
+    }
+
     private void OnMouseDown()
     {
         // Only allow dragging if: 
@@ -402,6 +423,47 @@ public class DragGrain : MonoBehaviour
                 activeDraggedGrain = null;
                 Debug.Log($"Released dragging lock - grain [{name}] is done or no longer active");
             }
+        }
+    }
+
+    // Add OnDestroy method to reset flag when scene is unloaded
+    private void OnDestroy()
+    {
+        // Reset the hasResetStaticVars flag when the scene is unloaded
+        // This ensures variables will be reset next time the scene loads
+        if (isOriginal)
+        {
+            hasResetStaticVars = false;
+            Debug.Log("Static variable reset flag cleared");
+        }
+    }
+
+    void OnEnable()
+    {
+        // Subscribe to scene loading event (only for original grain)
+        if (isOriginal)
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+    }
+
+    void OnDisable()
+    {
+        // Unsubscribe from scene loading event (only for original grain)
+        if (isOriginal)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+    }
+
+    // Called when a scene is loaded
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset variables when this scene is loaded
+        if (scene.buildIndex == SceneManager.GetActiveScene().buildIndex)
+        {
+            ResetAllStaticVariables();
+            Debug.Log("Static variables reset on scene reload");
         }
     }
 }
