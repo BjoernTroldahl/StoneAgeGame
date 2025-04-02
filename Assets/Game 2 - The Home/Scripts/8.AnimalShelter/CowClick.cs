@@ -17,10 +17,18 @@ public class CowClick : MonoBehaviour
     private void OnMouseDown()
     {
         Debug.Log("Cow clicked");
-        DragMilkVessel vessel = FindFirstObjectByType<DragMilkVessel>();
-        if (vessel != null)
+        
+        // Find the currently occupying vessel
+        DragMilkVessel[] allVessels = FindObjectsByType<DragMilkVessel>(FindObjectsSortMode.None);
+        foreach (DragMilkVessel vessel in allVessels)
         {
-            vessel.OnCowClicked();
+            if (vessel.IsOccupyingTarget())
+            {
+                vessel.OnCowClicked();
+                return;
+            }
         }
+        
+        Debug.Log("No vessel is currently at the target position");
     }
 }

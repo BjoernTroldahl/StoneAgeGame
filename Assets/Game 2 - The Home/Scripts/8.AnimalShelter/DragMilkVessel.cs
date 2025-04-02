@@ -1,31 +1,45 @@
 using UnityEngine;
 using System.Collections;
+
 public class DragMilkVessel : MonoBehaviour
 {
+    // Static variable to track if target circle is occupied
+    private static bool isTargetOccupied = false;
+    private static DragMilkVessel occupyingVessel = null;
+
     [Header("References")]
-    [SerializeField] private Transform circle1;
-    [SerializeField] private Transform circle2;           // Add second circle reference
-    [SerializeField] private Sprite milkedVesselSprite;   // Empty vessel sprite
-    [SerializeField] private Sprite milk1Sprite;          // First level milk sprite
-    [SerializeField] private Sprite milk2Sprite;          // Second level milk sprite
-    [SerializeField] private Sprite milk3Sprite;          // Third level milk sprite (add this)
+    [SerializeField] private Transform startCircle;
+    [SerializeField] private Transform targetCircle;
+    [SerializeField] private Sprite milkedVesselSprite;
+    [SerializeField] private Sprite milk1Sprite;
+    [SerializeField] private Sprite milk2Sprite;
+    [SerializeField] private Sprite milk3Sprite;
     [SerializeField] private GameObject cow;
     [SerializeField] private Sprite cowIdleSprite;
     [SerializeField] private Sprite cowMilkingSprite;
     [SerializeField] private MilkDroplet milkDroplet;
 
+    [Header("Cloning")]
+    [SerializeField] private bool isOriginal = true;
+    [SerializeField] private Transform circle3;
+    [SerializeField] private Transform circle4;
+    [SerializeField] private GameObject vesselPrefab;
+
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
-    [SerializeField] private float milkingAnimationDuration = 0.5f;  // Add new parameter
+    [SerializeField] private float milkingAnimationDuration = 0.5f;
 
     private bool isDragging = false;
     private bool isSnapped = false;
-    private bool isMilked = false;  // Add new state variable
+    private bool isMilked = false;
     private Vector3 offset;
     private Camera mainCamera;
-    private SpriteRenderer spriteRenderer;  // Add sprite renderer reference
+    private SpriteRenderer spriteRenderer;
     private BoxCollider2D cowCollider;
-    private int milkLevel = 0;  // Track milk level counter
+    private int milkLevel = 0;
+
+    // Each vessel needs its own droplet instance
+    private MilkDroplet myDroplet;
 
     void Start()
     {
@@ -43,28 +57,55 @@ public class DragMilkVessel : MonoBehaviour
             return;
         }
         
+        // Always ensure cow collider starts disabled
         if (cow != null)
         {
             cowCollider = cow.GetComponent<BoxCollider2D>();
             if (cowCollider != null)
             {
-                cowCollider.enabled = false; // Disable cow collider at start
+                cowCollider.enabled = false;
+                Debug.Log($"Cow collider disabled for [{name}] at start");
             }
         }
-
-        // Subscribe to droplet animation completion
-        if (milkDroplet != null)
+        
+        // Clone the droplet for each vessel
+        if (milkDroplet != null && !isOriginal)
         {
-            milkDroplet.OnDropletAnimationComplete += OnDropletAnimationComplete;
+            GameObject dropletClone = Instantiate(milkDroplet.gameObject, milkDroplet.transform.position, Quaternion.identity);
+            myDroplet = dropletClone.GetComponent<MilkDroplet>();
+            if (myDroplet != null)
+            {
+                myDroplet.OnDropletAnimationComplete += OnDropletAnimationComplete;
+            }
+        }
+        else
+        {
+            myDroplet = milkDroplet;
+            if (myDroplet != null)
+            {
+                myDroplet.OnDropletAnimationComplete += OnDropletAnimationComplete;
+            }
+        }
+        
+        // Position at start circle
+        if (startCircle != null)
+        {
+            transform.position = startCircle.position;
+            Debug.Log($"Vessel [{name}] positioned at start circle");
+        }
+        
+        // Spawn clones if this is the original vessel
+        if (isOriginal && vesselPrefab != null)
+        {
+            SpawnClones();
         }
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe to prevent memory leaks
-        if (milkDroplet != null)
+        if (myDroplet != null)
         {
-            milkDroplet.OnDropletAnimationComplete -= OnDropletAnimationComplete;
+            myDroplet.OnDropletAnimationComplete -= OnDropletAnimationComplete;
         }
     }
 
@@ -77,43 +118,66 @@ public class DragMilkVessel : MonoBehaviour
                                           mousePosition.y + offset.y, 
                                           transform.position.z);
 
-            // Check for circle1 snapping only when not milked fully
-            if (milkLevel < 3 && Vector2.Distance(transform.position, circle1.position) < snapDistance)
+            // Check for target circle snapping only when not occupied or occupied by this vessel
+            if (milkLevel < 3 && Vector2.Distance(transform.position, targetCircle.position) < snapDistance && 
+                (!isTargetOccupied || occupyingVessel == this))
             {
-                SnapToCircle(circle1, 1);
+                SnapToCircle(targetCircle, 1);
             }
-            // Check for circle2 snapping only when fully milked
-            else if (milkLevel >= 3 && Vector2.Distance(transform.position, circle2.position) < snapDistance)
+            else if (milkLevel >= 3 && Vector2.Distance(transform.position, startCircle.position) < snapDistance)
             {
-                SnapToCircle(circle2, 2);
+                SnapToCircle(startCircle, 2);
             }
         }
     }
 
     private void OnMouseDown()
     {
-        // Allow dragging after fully milked or if not snapped
-        if ((milkLevel >= 3 && isSnapped) || !isSnapped)
+        // If vessel is at target and fully milked, allow dragging
+        if (isSnapped && milkLevel >= 3)
+        {
+            Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            offset = transform.position - mousePosition;
+            isDragging = true;
+            isSnapped = false; // Unsnap immediately
+            
+            // Free target if this was occupying it
+            if (isTargetOccupied && occupyingVessel == this)
+            {
+                isTargetOccupied = false;
+                occupyingVessel = null;
+                
+                // Disable cow collider
+                if (cow != null && cowCollider != null)
+                {
+                    cowCollider.enabled = false;
+                    Debug.Log($"Cow interaction disabled by [{name}]");
+                }
+                
+                Debug.Log($"Target circle freed by [{name}]");
+            }
+            
+            Debug.Log($"Vessel [{name}] (milk level {milkLevel}) being moved to final position");
+            return;
+        }
+        
+        // Allow initial dragging if not snapped yet
+        if (!isSnapped)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
             
-            // Reset snapped state if fully milked and was previously snapped
-            if (milkLevel >= 3 && isSnapped)
-            {
-                isSnapped = false;
-                Debug.Log("Vessel ready for final placement");
-            }
-            
-            // Only change sprite if it's first being picked up (not milk level 3)
             if (milkLevel == 0 && spriteRenderer != null && milkedVesselSprite != null)
             {
                 spriteRenderer.sprite = milkedVesselSprite;
-                Debug.Log("Vessel sprite changed on drag");
+                Debug.Log($"Vessel [{name}] sprite changed on drag");
             }
             return;
         }
+        
+        // If we get here, it means the vessel is snapped but not fully milked
+        Debug.Log($"Vessel [{name}] is snapped and not draggable yet (milk level: {milkLevel})");
     }
 
     private void OnMouseUp()
@@ -121,16 +185,25 @@ public class DragMilkVessel : MonoBehaviour
         isDragging = false;
     }
 
+    // Add this method to check if this vessel is occupying the target
+    public bool IsOccupyingTarget()
+    {
+        return isTargetOccupied && occupyingVessel == this;
+    }
+
     public void OnCowClicked()
     {
-        if (isSnapped && milkLevel < 3)  // Allow up to 3 milk levels
+        // Add more detailed logging
+        Debug.Log($"OnCowClicked called for {name}, isSnapped: {isSnapped}, milkLevel: {milkLevel}");
+        
+        if (isSnapped && milkLevel < 3 && IsOccupyingTarget())
         {
             StartCoroutine(MilkCowAnimation());
-            Debug.Log($"Starting cow milking sequence - Current milk level: {milkLevel}");
+            Debug.Log($"Vessel [{name}] starting milking - Current level: {milkLevel}");
         }
         else
         {
-            Debug.Log($"Cow click ignored - Snapped: {isSnapped}, Milk Level: {milkLevel}");
+            Debug.Log($"Vessel [{name}] cannot be milked - isSnapped: {isSnapped}, milkLevel: {milkLevel}, occupying: {IsOccupyingTarget()}");
         }
     }
 
@@ -142,22 +215,24 @@ public class DragMilkVessel : MonoBehaviour
         
         if (circleNumber == 1)
         {
-            // Enable cow collider only when snapped to first circle
-            if (cowCollider != null)
+            // Mark target as occupied by this vessel
+            isTargetOccupied = true;
+            occupyingVessel = this;
+            
+            // Enable cow collider only when a vessel is at the target circle
+            if (cow != null && cowCollider != null)
             {
                 cowCollider.enabled = true;
-                Debug.Log("Cow interaction enabled");
+                Debug.Log($"Vessel [{name}] enabled cow interaction");
             }
-            Debug.Log("Milk vessel snapped to circle 1");
+            Debug.Log($"Vessel [{name}] is now occupying target circle");
         }
         else if (circleNumber == 2)
         {
-            Debug.Log("Filled vessel placed in final position!");
-            // Here you could trigger game progression or other events
+            Debug.Log($"Vessel [{name}] placed in final position!");
         }
     }
 
-    // Modify MilkCowAnimation to set the state after animation
     private IEnumerator MilkCowAnimation()
     {
         SpriteRenderer cowRenderer = cow.GetComponent<SpriteRenderer>();
@@ -167,27 +242,24 @@ public class DragMilkVessel : MonoBehaviour
             yield break;
         }
 
-        // Change to milking sprite
+        Debug.Log($"Changing cow sprite for vessel [{name}]");
         cowRenderer.sprite = cowMilkingSprite;
         
-        // Trigger droplet animation
-        if (milkDroplet != null)
+        if (myDroplet != null)
         {
-            milkDroplet.TriggerDropletFall();
+            myDroplet.TriggerDropletFall();
+            Debug.Log($"Triggered droplet fall for vessel [{name}]");
+        }
+        else
+        {
+            Debug.LogError($"Droplet is null for vessel [{name}]");
         }
         
-        Debug.Log("Cow milking animation started");
-        
-        // Use the configurable duration
         yield return new WaitForSeconds(milkingAnimationDuration);
         
-        // Change back to idle sprite
         cowRenderer.sprite = cowIdleSprite;
-        
-        // Set milked state but don't change sprite yet
         isMilked = true;
-        
-        Debug.Log($"Milking complete after {milkingAnimationDuration} seconds");
+        Debug.Log($"Completed milking animation for vessel [{name}]");
     }
 
     private void OnDropletAnimationComplete()
@@ -199,17 +271,55 @@ public class DragMilkVessel : MonoBehaviour
             if (milkLevel == 1 && milk1Sprite != null)
             {
                 spriteRenderer.sprite = milk1Sprite;
-                Debug.Log("Vessel filled to level 1");
+                Debug.Log($"Vessel [{name}] filled to level 1");
             }
             else if (milkLevel == 2 && milk2Sprite != null)
             {
                 spriteRenderer.sprite = milk2Sprite;
-                Debug.Log("Vessel filled to level 2");
+                Debug.Log($"Vessel [{name}] filled to level 2");
             }
             else if (milkLevel == 3 && milk3Sprite != null)
             {
                 spriteRenderer.sprite = milk3Sprite;
-                Debug.Log("Vessel filled to level 3 (maximum) - Ready for final placement");
+                Debug.Log($"Vessel [{name}] filled to level 3 (maximum)");
+                
+                // Only disable cow collider when fully milked (level 3)
+                if (cow != null && cowCollider != null)
+                {
+                    cowCollider.enabled = false;
+                    Debug.Log($"Cow interaction disabled after vessel [{name}] is fully milked");
+                }
+            }
+        }
+    }
+
+    private void SpawnClones()
+    {
+        if (circle3 != null)
+        {
+            GameObject clone1 = Instantiate(vesselPrefab, circle3.position, Quaternion.identity);
+            clone1.name = "Vessel_Clone1";
+            DragMilkVessel cloneScript1 = clone1.GetComponent<DragMilkVessel>();
+            if (cloneScript1 != null)
+            {
+                cloneScript1.isOriginal = false;
+                cloneScript1.startCircle = circle3;
+                cloneScript1.targetCircle = targetCircle;
+                Debug.Log("Spawned first clone at circle3");
+            }
+        }
+        
+        if (circle4 != null)
+        {
+            GameObject clone2 = Instantiate(vesselPrefab, circle4.position, Quaternion.identity);
+            clone2.name = "Vessel_Clone2";
+            DragMilkVessel cloneScript2 = clone2.GetComponent<DragMilkVessel>();
+            if (cloneScript2 != null)
+            {
+                cloneScript2.isOriginal = false;
+                cloneScript2.startCircle = circle4;
+                cloneScript2.targetCircle = targetCircle;
+                Debug.Log("Spawned second clone at circle4");
             }
         }
     }
