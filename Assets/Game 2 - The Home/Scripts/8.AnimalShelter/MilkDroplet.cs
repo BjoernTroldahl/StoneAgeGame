@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System;
+
 public class MilkDroplet : MonoBehaviour
 {
     [Header("Settings")]
@@ -9,6 +11,9 @@ public class MilkDroplet : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Vector3 startPosition;
     private Vector3 endPosition;
+
+    // Event to notify when animation completes
+    public event Action OnDropletAnimationComplete;
 
     private void Start()
     {
@@ -48,5 +53,8 @@ public class MilkDroplet : MonoBehaviour
 
         spriteRenderer.enabled = false;
         Debug.Log("Droplet finished falling");
+        
+        // Notify listeners that animation is complete
+        OnDropletAnimationComplete?.Invoke();
     }
 }

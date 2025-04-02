@@ -4,11 +4,12 @@ public class DragMilkVessel : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform circle1;
-    [SerializeField] private Sprite milkedVesselSprite;
-    [SerializeField] private GameObject cow;               // Changed to GameObject
+    [SerializeField] private Sprite milkedVesselSprite;  // Original milk sprite
+    [SerializeField] private Sprite milk1Sprite;         // Add new sprite reference
+    [SerializeField] private GameObject cow;
     [SerializeField] private Sprite cowIdleSprite;
     [SerializeField] private Sprite cowMilkingSprite;
-    [SerializeField] private MilkDroplet milkDroplet;  // Add this line
+    [SerializeField] private MilkDroplet milkDroplet;
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
@@ -45,6 +46,21 @@ public class DragMilkVessel : MonoBehaviour
             {
                 cowCollider.enabled = false; // Disable cow collider at start
             }
+        }
+
+        // Subscribe to droplet animation completion
+        if (milkDroplet != null)
+        {
+            milkDroplet.OnDropletAnimationComplete += OnDropletAnimationComplete;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe to prevent memory leaks
+        if (milkDroplet != null)
+        {
+            milkDroplet.OnDropletAnimationComplete -= OnDropletAnimationComplete;
         }
     }
 
@@ -146,13 +162,18 @@ public class DragMilkVessel : MonoBehaviour
         // Change back to idle sprite
         cowRenderer.sprite = cowIdleSprite;
         
-        // Set milked state and change vessel sprite after animation
+        // We don't need to set the sprite here anymore since it will be done by the droplet callback
         isMilked = true;
-        if (spriteRenderer != null && milkedVesselSprite != null)
-        {
-            spriteRenderer.sprite = milkedVesselSprite;
-        }
         
         Debug.Log($"Milking complete after {milkingAnimationDuration} seconds - Vessel filled");
+    }
+
+    private void OnDropletAnimationComplete()
+    {
+        if (spriteRenderer != null && milk1Sprite != null)
+        {
+            spriteRenderer.sprite = milk1Sprite;
+            Debug.Log("Vessel filled with milk");
+        }
     }
 }
