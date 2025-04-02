@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-
 public class DragMilkVessel : MonoBehaviour
 {
     [Header("References")]
@@ -9,9 +8,11 @@ public class DragMilkVessel : MonoBehaviour
     [SerializeField] private GameObject cow;               // Changed to GameObject
     [SerializeField] private Sprite cowIdleSprite;
     [SerializeField] private Sprite cowMilkingSprite;
+    [SerializeField] private MilkDroplet milkDroplet;  // Add this line
 
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
+    [SerializeField] private float milkingAnimationDuration = 0.5f;  // Add new parameter
 
     private bool isDragging = false;
     private bool isSnapped = false;
@@ -130,10 +131,17 @@ public class DragMilkVessel : MonoBehaviour
 
         // Change to milking sprite
         cowRenderer.sprite = cowMilkingSprite;
+        
+        // Trigger droplet animation
+        if (milkDroplet != null)
+        {
+            milkDroplet.TriggerDropletFall();
+        }
+        
         Debug.Log("Cow milking animation started");
         
-        // Wait for half a second
-        yield return new WaitForSeconds(0.5f);
+        // Use the configurable duration
+        yield return new WaitForSeconds(milkingAnimationDuration);
         
         // Change back to idle sprite
         cowRenderer.sprite = cowIdleSprite;
@@ -145,6 +153,6 @@ public class DragMilkVessel : MonoBehaviour
             spriteRenderer.sprite = milkedVesselSprite;
         }
         
-        Debug.Log("Milking complete - Vessel filled");
+        Debug.Log($"Milking complete after {milkingAnimationDuration} seconds - Vessel filled");
     }
 }
