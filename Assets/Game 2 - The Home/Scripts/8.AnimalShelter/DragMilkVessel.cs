@@ -3,9 +3,11 @@ using System.Collections;
 
 public class DragMilkVessel : MonoBehaviour
 {
-    // Static variable to track if target circle is occupied
+    // Static variables to track game state
     private static bool isTargetOccupied = false;
     private static DragMilkVessel occupyingVessel = null;
+    private static int completedVessels = 0;     // Track completed vessels
+    private static int totalVessels = 3;         // Total vessels needed to win
 
     [Header("References")]
     [SerializeField] private Transform startCircle;
@@ -33,7 +35,7 @@ public class DragMilkVessel : MonoBehaviour
 
     private bool isDragging = false;
     private bool isSnapped = false;
-    private bool isMilked = false;
+    private bool isCompleted = false;  // Renamed from isMilked - this marks if vessel has been counted
     private Vector3 offset;
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;
@@ -101,6 +103,12 @@ public class DragMilkVessel : MonoBehaviour
         {
             SpawnClones();
         }
+        
+        // Log initial completion state
+        if (isOriginal)
+        {
+            Debug.Log($"Game started with {completedVessels}/{totalVessels} vessels completed");
+        }
     }
 
     private void OnDestroy()
@@ -108,6 +116,13 @@ public class DragMilkVessel : MonoBehaviour
         if (myDroplet != null)
         {
             myDroplet.OnDropletAnimationComplete -= OnDropletAnimationComplete;
+        }
+        
+        // Reset completion counter when original is destroyed
+        if (isOriginal)
+        {
+            Debug.Log($"Original vessel destroyed, resetting completion counter from {completedVessels} to 0");
+            completedVessels = 0;
         }
     }
 
@@ -252,7 +267,43 @@ public class DragMilkVessel : MonoBehaviour
         }
         else if (circleNumber == 2)
         {
-            Debug.Log($"Vessel [{name}] placed in final position!");
+            // Detailed logging
+            Debug.Log($"VESSEL COMPLETION CHECK: [{name}] at final position - milkLevel: {milkLevel}, isCompleted: {isCompleted}");
+            Debug.Log($"Current completion count: {completedVessels}/{totalVessels}");
+            
+            // Only count if this vessel is fully milked and wasn't already counted
+            if (milkLevel >= 3 && !isCompleted)
+            {
+                isCompleted = true; // Mark as counted for completion
+                completedVessels++;
+                Debug.Log($"VESSEL COMPLETED: [{name}] now counts toward total! New count: {completedVessels}/{totalVessels}");
+                
+                // Check for win condition
+                CheckWinCondition();
+            }
+            else
+            {
+                // Log why it wasn't counted
+                Debug.Log($"VESSEL NOT COUNTED: [{name}] - milkLevel: {milkLevel}, isCompleted: {isCompleted}");
+            }
+        }
+    }
+    
+    private void CheckWinCondition()
+    {
+        Debug.Log($"WIN CONDITION CHECK: {completedVessels}/{totalVessels} vessels completed");
+        
+        if (completedVessels >= totalVessels)
+        {
+            Debug.Log("*************************************************");
+            Debug.Log("*************** CONGRATS! YOU WON ***************");
+            Debug.Log("*************************************************");
+            
+            // You could add additional effects here
+        }
+        else
+        {
+            Debug.Log($"Not enough vessels completed yet, need {totalVessels - completedVessels} more");
         }
     }
 
@@ -281,7 +332,6 @@ public class DragMilkVessel : MonoBehaviour
         yield return new WaitForSeconds(milkingAnimationDuration);
         
         cowRenderer.sprite = cowIdleSprite;
-        isMilked = true;
         Debug.Log($"Completed milking animation for vessel [{name}]");
     }
 
