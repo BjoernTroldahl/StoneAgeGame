@@ -10,6 +10,7 @@ public class TorchFire : MonoBehaviour
     [SerializeField] private GameObject[] treeObjects;  // Add reference to tree objects
     [SerializeField] private float detectionRange = 2f; // Range at which torch triggers fire
     [SerializeField] private GameObject torch;          // Reference to the torch object
+    [SerializeField] private float axeDetectionRange = 1.5f; // Range for axe to detect dead trees
 
     [Header("Fire Animation")]
     [SerializeField] private Sprite fire1Sprite;    // Assign fire1_0 sprite in inspector
@@ -17,11 +18,11 @@ public class TorchFire : MonoBehaviour
     [SerializeField] private Sprite deadTreeSprite;    // Add this field
     [SerializeField] private float switchInterval = 0.3f;
     [SerializeField] private float burnDuration = 5f;
-    [SerializeField] private Vector3 deadTreeScale = new Vector3(0.29f, 0.29f, 0.29f);
 
     private Dictionary<GameObject, Coroutine> activeAnimations = new Dictionary<GameObject, Coroutine>();
     private HashSet<GameObject> burnedTrees = new HashSet<GameObject>();  // Track burned trees
-    private HashSet<GameObject> hiddenTrees = new HashSet<GameObject>();  // Add this field at class level
+    private HashSet<GameObject> hiddenTrees = new HashSet<GameObject>();  // Track hidden trees
+    private Dragging torchScript; // Reference to the Dragging script
 
     private void Start()
     {
@@ -39,14 +40,29 @@ public class TorchFire : MonoBehaviour
                 }
             }
         }
+        
+        // Get reference to the Dragging script
+        if (torch != null)
+        {
+            torchScript = torch.GetComponent<Dragging>();
+            if (torchScript == null)
+            {
+                Debug.LogError("Dragging script not found on torch object!");
+            }
+        }
     }
 
     private void Update()
     {
-        // Check for torch proximity
-        if (torch != null)
+        // Skip if torch reference is missing
+        if (torch == null) return;
+        
+        // Get the torch's current state (axe or torch)
+        bool isAxe = torchScript != null && torchScript.HasTransformedToAxe();
+        
+        // Check for torch proximity to start fires
+        if (!isAxe) // Only start fires if it's still a torch
         {
-            // Check distance between torch and each fire sprite
             foreach (GameObject fire in fireSprites)
             {
                 if (fire != null)
@@ -60,25 +76,28 @@ public class TorchFire : MonoBehaviour
                 }
             }
         }
-
-        // Check for clicks on dead trees
-        if (Input.GetMouseButtonDown(0))
+        else // If it's an axe, check for proximity to dead trees
         {
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
-
-            if (hit.collider != null)
+            foreach (GameObject tree in treeObjects)
             {
-                GameObject clickedObject = hit.collider.gameObject;
-                int treeIndex = System.Array.IndexOf(treeObjects, clickedObject);
-                
-                // Check if clicked object is a burned tree
-                if (treeIndex >= 0 && treeIndex < fireSprites.Length && burnedTrees.Contains(fireSprites[treeIndex]))
+                if (tree != null && IsTreeBurned(tree) && !hiddenTrees.Contains(tree))
                 {
-                    HideDeadTree(clickedObject);
+                    float distance = Vector2.Distance(torch.transform.position, tree.transform.position);
+                    
+                    if (distance <= axeDetectionRange)
+                    {
+                        HideDeadTree(tree);
+                    }
                 }
             }
         }
+    }
+    
+    // Helper method to check if a tree is burned
+    private bool IsTreeBurned(GameObject tree)
+    {
+        int treeIndex = System.Array.IndexOf(treeObjects, tree);
+        return treeIndex >= 0 && treeIndex < fireSprites.Length && burnedTrees.Contains(fireSprites[treeIndex]);
     }
 
     private void RevealFire(GameObject fire)
@@ -142,7 +161,6 @@ public class TorchFire : MonoBehaviour
 
         // Change tree to dead tree sprite
         treeRenderer.sprite = deadTreeSprite;
-        treeObject.transform.localScale = deadTreeScale;
         burnedTrees.Add(fire);
 
         // Hide fire effect
@@ -163,7 +181,7 @@ public class TorchFire : MonoBehaviour
                 color.a = 0f;
                 treeRenderer.color = color;
                 hiddenTrees.Add(tree);
-                Debug.Log($"Dead tree hidden: {tree.name}");
+                Debug.Log($"Dead tree chopped down with axe: {tree.name}");
 
                 // Check if all burned trees are now hidden
                 if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)

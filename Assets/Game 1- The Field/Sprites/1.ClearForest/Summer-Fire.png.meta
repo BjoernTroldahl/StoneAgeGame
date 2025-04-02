@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cc06d00e117c72043b61ae81a82e317c
+guid: e0e16eb7a2f901144a78891dcbd46db6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1700892053915081011
-    second: Sickle_0
+      213: -4418413142022741849
+    second: Summer-Fire_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Sickle_0
+      name: Summer-Fire_0
       rect:
         serializedVersion: 2
-        x: 402
-        y: 320
-        width: 220
-        height: 385
+        x: 933
+        y: 755
+        width: 181
+        height: 539
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dc66b1d40b73568e0800000000000000
-      internalID: -1700892053915081011
+      spriteID: 7a021d638a4aea2c0800000000000000
+      internalID: -4418413142022741849
       vertices: []
       indices: 
       edges: []

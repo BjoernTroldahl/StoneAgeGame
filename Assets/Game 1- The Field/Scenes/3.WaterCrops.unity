@@ -1909,6 +1909,63 @@ MonoBehaviour:
   waterDropEffect: {fileID: 589777001}
   waterDropOffset: 1.2
   grownWheatSprite: {fileID: -441566554028475642, guid: ec4eb0c8474b21e42856c4b000d49179, type: 3}
+--- !u!1001 &2029623700
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2757193462260937423, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_Name
+      value: Watering
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.348098
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.2878838
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5244536628317110247, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e4b09e2dc6820344bbd1e3ae82ebd808, type: 3}
 --- !u!1 &2034109059
 GameObject:
   m_ObjectHideFlags: 0
@@ -2166,3 +2223,4 @@ SceneRoots:
   - {fileID: 251158125}
   - {fileID: 46902265}
   - {fileID: 2130198397}
+  - {fileID: 2029623700}
