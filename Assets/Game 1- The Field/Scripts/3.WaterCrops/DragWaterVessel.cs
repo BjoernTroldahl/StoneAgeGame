@@ -32,6 +32,7 @@ public class DragWaterVessel : MonoBehaviour
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
+            //hi
             isDragging = true;
         }
     }

@@ -23,7 +23,6 @@ public class WaterVesselController : MonoBehaviour
     [SerializeField] private float waterXOffset = 0.5f;   // Horizontal offset for water particles
     [SerializeField] private float waterYOffset = -0.2f;  // Vertical offset for water particles (negative = down)
     [SerializeField] private float waterRotationLeft = 270f;  // Rotation when watering from right to left (in degrees)
-    [SerializeField] private float waterRotationRight = 90f;  // Rotation when watering from left to right (in degrees)
     [SerializeField] private float waterVelocityModifier = 1f; // Multiplier for particle velocity
 
     [Header("Grown Wheat Settings")]
