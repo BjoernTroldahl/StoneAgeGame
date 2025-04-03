@@ -11,20 +11,27 @@ public class WaterVesselController : MonoBehaviour
     [SerializeField] private float rotationAngle = 45f;
     [SerializeField] private float rotationDuration = 0.5f;
     [SerializeField] private float pouringDuration = 2.0f;
-    [SerializeField] private float snappingOffset = 0.5f; // Add this line for offset distance
+    [SerializeField] private float snappingOffset = 0.5f;
 
     [Header("References")]
     [SerializeField] private List<Transform> seedlingPoints;
-    [SerializeField] private List<SpriteRenderer> seedlingRenderers; // Add this line
-    [SerializeField] private GameObject waterDropEffect;
-    [SerializeField] private float waterDropOffset = 0.5f; // Add this for water position adjustment
-    [SerializeField] private Sprite grownWheatSprite; // Add this for the wheat-03-green sprite
+    [SerializeField] private List<SpriteRenderer> seedlingRenderers;
+    [SerializeField] private GameObject waterParticleSystem;
+    [SerializeField] private Sprite grownWheatSprite;
+
+    [Header("Water Particle Settings")]
+    [SerializeField] private float waterXOffset = 0.5f;   // Horizontal offset for water particles
+    [SerializeField] private float waterYOffset = -0.2f;  // Vertical offset for water particles (negative = down)
+    [SerializeField] private float waterRotationLeft = 270f;  // Rotation when watering from right to left (in degrees)
+    [SerializeField] private float waterRotationRight = 90f;  // Rotation when watering from left to right (in degrees)
+    [SerializeField] private float waterVelocityModifier = 1f; // Multiplier for particle velocity
 
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool isDragging = false;
     private bool isAnimating = false;
     private HashSet<Transform> wateredSeedlings = new HashSet<Transform>();
+    private ParticleSystem waterParticles;
 
     public bool IsAnimating
     {
@@ -33,9 +40,25 @@ public class WaterVesselController : MonoBehaviour
 
     void Start()
     {
-        if (waterDropEffect != null)
+        // Get the ParticleSystem component from the GameObject
+        if (waterParticleSystem != null)
         {
-            waterDropEffect.SetActive(false); // Ensure water effect is hidden at start
+            waterParticles = waterParticleSystem.GetComponent<ParticleSystem>();
+            if (waterParticles != null)
+            {
+                // Make sure it's stopped at start
+                waterParticles.Stop();
+                waterParticleSystem.SetActive(false);
+                Debug.Log("Water particle system initialized and stopped");
+            }
+            else
+            {
+                Debug.LogError("Water particle system GameObject doesn't have a ParticleSystem component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Water particle system not assigned!");
         }
     }
 
@@ -102,29 +125,19 @@ public class WaterVesselController : MonoBehaviour
         originalRotation = transform.rotation;
         float elapsedTime = 0;
 
-        // Determine direction based on relative position
-        float direction = transform.position.x > seedling.position.x ? 1f : -1f;
+        // Always position on the right side of the seedling
         
-        // Set water effect direction and position
-        if (waterDropEffect != null)
+        // Set up water particle system
+        if (waterParticleSystem != null && waterParticles != null)
         {
-            SpriteRenderer waterSprite = waterDropEffect.GetComponent<SpriteRenderer>();
-            if (waterSprite != null)
-            {
-                // Flip sprite if pouring from right side
-                waterSprite.flipX = (direction > 0);
-                
-                // Adjust water drop position based on direction
-                Vector3 waterPos = waterDropEffect.transform.localPosition;
-                waterPos.x = direction > 0 ? -waterDropOffset : waterDropOffset;
-                waterDropEffect.transform.localPosition = waterPos;
-            }
+            // We'll position it during the pouring phase
+            waterParticleSystem.SetActive(false);
         }
 
-        // Calculate offset position
-        Vector3 offsetPosition = seedling.position + new Vector3(snappingOffset * direction, 0, 0);
+        // Calculate offset position - always to the right of seedling
+        Vector3 offsetPosition = seedling.position + new Vector3(snappingOffset, 0, 0);
 
-        // Move to offset position near seedling
+        // Move to offset position on the right side of seedling
         while (elapsedTime < 1)
         {
             elapsedTime += Time.deltaTime * moveSpeed;
@@ -132,28 +145,51 @@ public class WaterVesselController : MonoBehaviour
             yield return null;
         }
 
-        // Rotate for pouring
+        // Rotate for pouring - always pour from right to left
         elapsedTime = 0;
         while (elapsedTime < rotationDuration)
         {
             elapsedTime += Time.deltaTime;
-            float currentAngle = Mathf.Lerp(0, rotationAngle * direction, elapsedTime / rotationDuration);
+            // Always rotate the vessel counterclockwise (negative angle)
+            float currentAngle = Mathf.Lerp(0, -rotationAngle, elapsedTime / rotationDuration);
             transform.rotation = originalRotation * Quaternion.Euler(0, 0, currentAngle);
             yield return null;
         }
 
-        // Show water effect during pouring
-        if (waterDropEffect != null)
+        // Activate and play water particle system during pouring
+        if (waterParticleSystem != null && waterParticles != null)
         {
-            waterDropEffect.SetActive(true);
+            // Calculate water position
+            Vector3 emissionPoint = transform.position;
+            // Apply horizontal offset - always on the left side of the vessel
+            emissionPoint.x -= waterXOffset;
+            // Apply vertical offset
+            emissionPoint.y += waterYOffset;
+            waterParticleSystem.transform.position = emissionPoint;
+            
+            // Always use the left rotation (watering from right to left)
+            waterParticleSystem.transform.rotation = Quaternion.Euler(0, 0, waterRotationLeft);
+            
+            // Modify velocity if needed
+            var mainModule = waterParticles.main;
+            // Store original start speed
+            float originalStartSpeed = mainModule.startSpeed.constant;
+            mainModule.startSpeed = originalStartSpeed * waterVelocityModifier;
+            
+            // Activate and play
+            waterParticleSystem.SetActive(true);
+            waterParticles.Play();
+            Debug.Log($"Started water particle effect with rotation {waterRotationLeft}°");
         }
 
         yield return new WaitForSeconds(pouringDuration);
 
-        // Hide water effect and grow seedling
-        if (waterDropEffect != null)
+        // Stop water particle system
+        if (waterParticleSystem != null && waterParticles != null)
         {
-            waterDropEffect.SetActive(false);
+            waterParticles.Stop();
+            waterParticleSystem.SetActive(false);
+            Debug.Log("Stopped water particle effect");
         }
 
         // Change seedling sprite and track it
@@ -179,12 +215,12 @@ public class WaterVesselController : MonoBehaviour
             }
         }
 
-        // Rotate back
+        // Rotate back - always rotate clockwise back to starting position
         elapsedTime = 0;
         while (elapsedTime < rotationDuration)
         {
             elapsedTime += Time.deltaTime;
-            float currentAngle = Mathf.Lerp(rotationAngle * direction, 0, elapsedTime / rotationDuration);
+            float currentAngle = Mathf.Lerp(-rotationAngle, 0, elapsedTime / rotationDuration);
             transform.rotation = originalRotation * Quaternion.Euler(0, 0, currentAngle);
             yield return null;
         }
