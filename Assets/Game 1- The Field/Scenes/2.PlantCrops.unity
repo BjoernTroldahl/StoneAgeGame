@@ -192,6 +192,7 @@ GameObject:
   - component: {fileID: 117293515}
   - component: {fileID: 117293514}
   - component: {fileID: 117293513}
+  - component: {fileID: 117293516}
   m_Layer: 3
   m_Name: Hole 1
   m_TagString: Untagged
@@ -315,6 +316,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &117293516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117293511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 2024244185}
 --- !u!1 &184443409
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,6 +340,7 @@ GameObject:
   - component: {fileID: 184443412}
   - component: {fileID: 184443411}
   - component: {fileID: 184443410}
+  - component: {fileID: 184443413}
   m_Layer: 3
   m_Name: Hole 5
   m_TagString: Untagged
@@ -449,6 +464,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &184443413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 184443409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 1176250396}
 --- !u!1 &249140248
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +510,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seedPrefab: {fileID: 249140248}
   spawnPosition: {x: 13.59, y: -2.89}
-  holeObject: {fileID: 0}
 --- !u!61 &249140250
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -572,7 +599,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -5851776067964197700, guid: a53bafc1f6b0a8244a9b49f7f1c05132, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1107,6 +1134,7 @@ GameObject:
   - component: {fileID: 846014088}
   - component: {fileID: 846014087}
   - component: {fileID: 846014086}
+  - component: {fileID: 846014089}
   m_Layer: 3
   m_Name: Hole 3
   m_TagString: Untagged
@@ -1230,6 +1258,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &846014089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846014084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 977807313}
 --- !u!1 &877915314
 GameObject:
   m_ObjectHideFlags: 0
@@ -1241,6 +1282,7 @@ GameObject:
   - component: {fileID: 877915318}
   - component: {fileID: 877915317}
   - component: {fileID: 877915316}
+  - component: {fileID: 877915319}
   m_Layer: 3
   m_Name: Hole 2
   m_TagString: Untagged
@@ -1364,6 +1406,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &877915319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 877915314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 1287846713}
 --- !u!1 &907774053
 GameObject:
   m_ObjectHideFlags: 0
@@ -1472,7 +1527,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: 4
   m_Sprite: {fileID: 6595172018246319583, guid: 2e2f944068e81b0449fd20ed2943e786, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1960,6 +2015,7 @@ GameObject:
   - component: {fileID: 1397672674}
   - component: {fileID: 1397672673}
   - component: {fileID: 1397672672}
+  - component: {fileID: 1397672675}
   m_Layer: 3
   m_Name: Hole 4
   m_TagString: Untagged
@@ -2083,6 +2139,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1397672675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397672671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 1066083364}
 --- !u!1 &1403035227
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,6 +2337,7 @@ GameObject:
   - component: {fileID: 1575970472}
   - component: {fileID: 1575970471}
   - component: {fileID: 1575970470}
+  - component: {fileID: 1575970473}
   m_Layer: 3
   m_Name: Hole 6
   m_TagString: Untagged
@@ -2391,6 +2461,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1575970473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575970469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffd9bd55c8563d142aba716da9f64c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  associatedCircle: {fileID: 1625338095}
 --- !u!1 &1625338093
 GameObject:
   m_ObjectHideFlags: 0
