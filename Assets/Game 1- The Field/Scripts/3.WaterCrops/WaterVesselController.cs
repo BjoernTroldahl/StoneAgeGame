@@ -26,12 +26,17 @@ public class WaterVesselController : MonoBehaviour
     [SerializeField] private float waterRotationRight = 90f;  // Rotation when watering from left to right (in degrees)
     [SerializeField] private float waterVelocityModifier = 1f; // Multiplier for particle velocity
 
+    [Header("Grown Wheat Settings")]
+    [SerializeField] private float grownWheatYOffset = 0.0f; // Vertical offset for grown wheat sprites
+    [SerializeField] private float grownWheatXOffset = 0.0f; // Optional horizontal offset for grown wheat sprites
+
     private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool isDragging = false;
     private bool isAnimating = false;
     private HashSet<Transform> wateredSeedlings = new HashSet<Transform>();
     private ParticleSystem waterParticles;
+    private Dictionary<Transform, Vector3> seedlingOriginalPositions = new Dictionary<Transform, Vector3>();
 
     public bool IsAnimating
     {
@@ -40,6 +45,12 @@ public class WaterVesselController : MonoBehaviour
 
     void Start()
     {
+        // Store original positions of seedlings for reference
+        foreach (Transform seedling in seedlingPoints)
+        {
+            seedlingOriginalPositions[seedling] = seedling.position;
+        }
+
         // Get the ParticleSystem component from the GameObject
         if (waterParticleSystem != null)
         {
@@ -202,9 +213,35 @@ public class WaterVesselController : MonoBehaviour
                 SpriteRenderer seedlingRenderer = seedlingRenderers[seedlingIndex];
                 if (seedlingRenderer != null && grownWheatSprite != null)
                 {
+                    // Change the sprite
                     seedlingRenderer.sprite = grownWheatSprite;
+                    
+                    // Add to watered seedlings
                     wateredSeedlings.Add(seedling);
-
+                    
+                    // Apply position offset to the sprite renderer's transform
+                    if (grownWheatYOffset != 0 || grownWheatXOffset != 0)
+                    {
+                        // Option 1: If the SpriteRenderer is on the same GameObject as the Transform
+                        // Adjust the sprite's local offset using the renderer's transform
+                        Transform spriteTransform = seedlingRenderer.transform;
+                        
+                        // Store original local position
+                        Vector3 originalLocalPos = spriteTransform.localPosition;
+                        
+                        // Apply the offsets to the sprite's local position
+                        Vector3 newLocalPos = new Vector3(
+                            originalLocalPos.x + grownWheatXOffset,
+                            originalLocalPos.y + grownWheatYOffset,
+                            originalLocalPos.z
+                        );
+                        
+                        // Set the new local position
+                        spriteTransform.localPosition = newLocalPos;
+                        
+                        Debug.Log($"Adjusted sprite position for seedling {seedlingIndex}: Local offset applied (X:{grownWheatXOffset}, Y:{grownWheatYOffset})");
+                    }
+                    
                     // Check if all seedlings are watered
                     if (wateredSeedlings.Count == seedlingPoints.Count)
                     {
