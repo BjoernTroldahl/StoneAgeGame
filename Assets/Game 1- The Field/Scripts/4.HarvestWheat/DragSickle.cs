@@ -14,6 +14,11 @@ public class DragSickle : MonoBehaviour
     [Header("Harvesting Settings")]
     [SerializeField] private float harvestCooldown = 1f;
     
+    [Header("Bundled Wheat Settings")]
+    [SerializeField] private float bundledWheatRotation = 90f; // Angle in degrees
+    [SerializeField] private Vector2 bundledWheatOffset = new Vector2(0f, -0.5f); // Offset for position
+    [SerializeField] private Vector2 bundledWheatColliderSize = new Vector2(23f, 18f); // Collider size
+    
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
@@ -175,12 +180,25 @@ public class DragSickle : MonoBehaviour
         {
             // Change sprite and scale
             spriteRenderer.sprite = bundledWheatSprite;
-            wheat.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
-
+            wheat.transform.localScale = new Vector3(1f, 1f, 1f);
+            
+            // Apply position offset for better visual placement
+            Vector3 currentPosition = wheat.transform.position;
+            wheat.transform.position = new Vector3(
+                currentPosition.x + bundledWheatOffset.x, 
+                currentPosition.y + bundledWheatOffset.y, 
+                currentPosition.z
+            );
+            
+            // Rotate the wheat to make it appear lying down sideways
+            // Using the editor parameter for rotation
+            wheat.transform.rotation = Quaternion.Euler(0, 0, bundledWheatRotation);
+            
             // Set specific collider size for bundled wheat
             if (collider != null)
             {
-                collider.size = new Vector2(18f, 23f);
+                // Use the configurable collider size
+                collider.size = bundledWheatColliderSize;
             }
 
             harvestedWheat.Add(wheat);
@@ -188,6 +206,8 @@ public class DragSickle : MonoBehaviour
             // Start cooldown
             canHarvest = false;
             harvestTimer = 0f;
+            
+            Debug.Log($"Wheat harvested and rotated {bundledWheatRotation}° with offset {bundledWheatOffset} at {wheat.transform.position}");
         }
     }
 
