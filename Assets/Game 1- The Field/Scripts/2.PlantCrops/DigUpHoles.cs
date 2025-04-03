@@ -106,7 +106,7 @@ public class DigUpHoles : MonoBehaviour
             spriteRenderer.sortingOrder = 3;
             
             // Set Scale
-            hole.transform.localScale = new Vector3(0.1408369f, 0.1408369f, 1f);
+            hole.transform.localScale = new Vector3(1f, 1f, 1f);
             
             Debug.Log($"Changed {hole.name} to dirt pile with adjusted order and scale");
 

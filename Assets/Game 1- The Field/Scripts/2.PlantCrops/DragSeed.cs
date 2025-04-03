@@ -16,6 +16,7 @@ public class Drag : MonoBehaviour
     private bool isLocked = false;
     private Vector3 offset;
     private SpriteRenderer spriteRenderer;
+    private BoxCollider2D boxCollider;
 
     void Start()
     {
@@ -25,11 +26,25 @@ public class Drag : MonoBehaviour
             Debug.LogError("No SpriteRenderer found on draggable object!");
             return;
         }
+        
+        // Get reference to the box collider
+        boxCollider = GetComponent<BoxCollider2D>();
+        if (boxCollider == null)
+        {
+            Debug.LogWarning("No BoxCollider2D found on draggable object. Collision detection might not work correctly.");
+        }
+        
         // Initialize seed count for the first seed
         if (seedCount == 0)
         {
             seedCount = 1;
             Debug.Log("Initial seed counted: 1");
+        }
+
+        // Ensure this seed starts with its collider enabled
+        if (boxCollider != null)
+        {
+            boxCollider.enabled = true;
         }
     }
 
@@ -43,10 +58,14 @@ public class Drag : MonoBehaviour
 
     private void OnMouseDown()
     {
+        // Debug to check if the collider is working
+        Debug.Log($"Mouse down on seed at {transform.position}, isLocked: {isLocked}");
+        
         if (spriteRenderer != null && spriteRenderer.color.a > 0 && !isLocked)
         {
             offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
             dragging = true;
+            Debug.Log($"Started dragging seed at {transform.position}");
         }
     }
 
@@ -55,6 +74,8 @@ public class Drag : MonoBehaviour
         if (dragging)
         {
             dragging = false;
+            Debug.Log($"Stopped dragging seed at {transform.position}");
+            
             if (dragEndedCallback != null)
             {
                 dragEndedCallback(this);
@@ -66,8 +87,16 @@ public class Drag : MonoBehaviour
     {
         if (!isLocked)
         {
+            Debug.Log($"Locking seed at position {transform.position}");
             isLocked = true;
             dragging = false;
+            
+            // Disable ONLY this specific seed's box collider
+            if (boxCollider != null)
+            {
+                boxCollider.enabled = false;
+                Debug.Log($"Disabled box collider for seed at position {transform.position} (instance ID: {gameObject.GetInstanceID()})");
+            }
             
             // Only spawn a new seed if we haven't reached the maximum
             if (seedCount < MAX_SEEDS)
@@ -88,6 +117,14 @@ public class Drag : MonoBehaviour
             Drag newDrag = newSeed.GetComponent<Drag>();
             if (newDrag != null)
             {
+                // Ensure the new seed has its collider enabled
+                BoxCollider2D newCollider = newSeed.GetComponent<BoxCollider2D>();
+                if (newCollider != null)
+                {
+                    newCollider.enabled = true;
+                    Debug.Log($"Enabled collider for new seed (instance ID: {newSeed.GetInstanceID()})");
+                }
+                
                 newDrag.dragEndedCallback = this.dragEndedCallback;
             }
         }
