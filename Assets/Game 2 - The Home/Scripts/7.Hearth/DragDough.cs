@@ -14,8 +14,12 @@ public class DragDough : MonoBehaviour
     [SerializeField] private Transform square4;
     [SerializeField] private Transform square5;
     [SerializeField] private GameObject doughPrefab;
+    
+    [Header("Sprites")]
+    [SerializeField] private Sprite rawBreadSprite;    // NEW: Add this sprite for raw bread
     [SerializeField] private Sprite breadHalfSprite;
     [SerializeField] private Sprite breadFinishedSprite;
+    
     [SerializeField] private Vector3 spawnPosition;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private Sprite backgroundNoDoughSprite;
@@ -35,6 +39,7 @@ public class DragDough : MonoBehaviour
     private Vector3 offset;
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;
+    private int defaultSortingOrder;
 
     // Static variables
     private static bool circle1Locked = false;
@@ -51,6 +56,14 @@ public class DragDough : MonoBehaviour
     {
         mainCamera = Camera.main;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // Store the default sorting order
+        if (spriteRenderer != null)
+        {
+            defaultSortingOrder = spriteRenderer.sortingOrder;
+            spriteRenderer.flipY = false;
+        }
+        
         if (doughCount == 0) spawnPosition = transform.position;
         doughCount++;
     }
@@ -66,14 +79,18 @@ public class DragDough : MonoBehaviour
             {
                 isHalfCooked = true;
                 spriteRenderer.sprite = breadHalfSprite;
+                // Ensure Flip Y is DISABLED for half-cooked bread
+                spriteRenderer.flipY = false;
                 canFlip = true;
                 Debug.Log("Bread is half cooked - Click to flip");
             }
-            // Second cooking phase after flip
+            // Second cooking phase after manual flip
             else if (isHalfCooked && spriteRenderer.flipY && cookTimer >= cookingTime * 2)
             {
                 isFullyCooked = true;
                 spriteRenderer.sprite = breadFinishedSprite;
+                // Ensure Flip Y is ENABLED for finished bread
+                spriteRenderer.flipY = true;
                 isLocked = false; // Allow dragging to squares
                 Debug.Log("Bread is fully cooked - Ready for storage");
             }
@@ -137,8 +154,10 @@ public class DragDough : MonoBehaviour
             }
         }
 
+        // Handle flipping of half-cooked bread
         if (canFlip && isHalfCooked && !isFullyCooked)
         {
+            // Set Flip Y to ENABLED when manually flipping the half-cooked bread
             spriteRenderer.flipY = true;
             canFlip = false;
             cookTimer = cookingTime; // Reset timer for second phase
@@ -157,6 +176,12 @@ public class DragDough : MonoBehaviour
             offset = transform.position - mousePosition;
             isDragging = true;
             
+            // Increase sorting order while dragging to appear on top
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.sortingOrder = 10; // Higher than any stacked bread
+            }
+            
             if (isFullyCooked)
             {
                 Debug.Log("Circle position freed up for new dough");
@@ -170,6 +195,15 @@ public class DragDough : MonoBehaviour
         isLocked = true;
         isDragging = false;
         cookTimer = 0f;
+
+        // Change sprite from dough ball to raw bread when snapped to a circle
+        if (rawBreadSprite != null && spriteRenderer != null)
+        {
+            spriteRenderer.sprite = rawBreadSprite;
+            // Set Flip Y to ENABLED for raw bread
+            spriteRenderer.flipY = true;
+            Debug.Log("Changed from dough ball to raw bread (with flipY enabled)");
+        }
 
         switch (circleNumber)
         {
@@ -187,6 +221,13 @@ public class DragDough : MonoBehaviour
         isLocked = true;
         isDragging = false;
 
+        // Set the sorting order based on the square number
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = squareNumber;
+            Debug.Log($"Set sorting order to {squareNumber} for bread in square {squareNumber}");
+        }
+
         switch (squareNumber)
         {
             case 1: square1Occupied = true; break;
@@ -198,6 +239,14 @@ public class DragDough : MonoBehaviour
                 if (doughCount == MAX_DOUGH && arrowSign != null)
                 {
                     arrowSign.enabled = true;
+                    
+                    // Make sure arrow is on top of all bread
+                    SpriteRenderer arrowRenderer = arrowSign.GetComponent<SpriteRenderer>();
+                    if (arrowRenderer != null)
+                    {
+                        arrowRenderer.sortingOrder = 6; // One higher than the highest bread
+                    }
+                    
                     Debug.Log("Final bread placed - Arrow sign enabled");
                 }
                 break;
@@ -219,7 +268,7 @@ public class DragDough : MonoBehaviour
                     circle1, circle2, circle3,
                     square1, square2, square3, square4, square5,
                     doughPrefab, spawnPosition,
-                    breadHalfSprite, breadFinishedSprite,
+                    rawBreadSprite, breadHalfSprite, breadFinishedSprite,  // Include raw bread sprite
                     backgroundImage, backgroundNoDoughSprite,
                     arrowSign
                 );
@@ -237,7 +286,7 @@ public class DragDough : MonoBehaviour
         Transform c1, Transform c2, Transform c3,
         Transform s1, Transform s2, Transform s3, Transform s4, Transform s5,
         GameObject prefab, Vector3 spawn, 
-        Sprite halfSprite, Sprite finishedSprite,
+        Sprite rawSprite, Sprite halfSprite, Sprite finishedSprite,  // Add rawSprite parameter
         Image background, Sprite noDoughSprite,
         SpriteRenderer arrow)
     {
@@ -251,6 +300,7 @@ public class DragDough : MonoBehaviour
         square5 = s5;
         doughPrefab = prefab;
         spawnPosition = spawn;
+        rawBreadSprite = rawSprite;         // Store the raw bread sprite
         breadHalfSprite = halfSprite;
         breadFinishedSprite = finishedSprite;
         backgroundImage = background;
