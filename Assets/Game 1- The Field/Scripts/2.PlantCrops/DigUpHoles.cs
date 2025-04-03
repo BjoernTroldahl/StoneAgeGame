@@ -102,13 +102,13 @@ public class DigUpHoles : MonoBehaviour
             // Change sprite
             spriteRenderer.sprite = dirtPileSprite;
             
-            // Set Order in Layer
-            spriteRenderer.sortingOrder = 3;
+            // Set Order in Layer to 4 (increased from 3)
+            spriteRenderer.sortingOrder = 4;
             
             // Set Scale
             hole.transform.localScale = new Vector3(1f, 1f, 1f);
             
-            Debug.Log($"Changed {hole.name} to dirt pile with adjusted order and scale");
+            Debug.Log($"Changed {hole.name} to dirt pile with sorting order 4 and adjusted scale");
 
             // Check if all holes are now dirt piles
             CheckGameCompletion();
