@@ -2086,7 +2086,7 @@ MonoBehaviour:
   minSwipeSpeed: 1
   harvestCooldown: 0
   bundledWheatRotation: -90
-  bundledWheatOffset: {x: 0, y: -0.5}
+  bundledWheatOffset: {x: 2, y: -1.5}
   bundledWheatColliderSize: {x: 3, y: 3.5}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
