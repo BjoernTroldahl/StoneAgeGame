@@ -2358,6 +2358,8 @@ MonoBehaviour:
   waterRotationLeft: 180
   waterRotationRight: -90
   waterVelocityModifier: 1
+  grownWheatYOffset: 0.8
+  grownWheatXOffset: -0.1
 --- !u!1001 &2029623700
 PrefabInstance:
   m_ObjectHideFlags: 0

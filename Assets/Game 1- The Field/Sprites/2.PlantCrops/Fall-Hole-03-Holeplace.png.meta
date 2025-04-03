@@ -1,0 +1,741 @@
+fileFormatVersion: 2
+guid: cbe156389602a614687317a4dc66a6b1
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5457922730272499812
+    second: Fall-Hole-03-Holeplace_0
+  - first:
+      213: -3464376402912170042
+    second: Fall-Hole-03-Holeplace_1
+  - first:
+      213: -4799976635552917571
+    second: Fall-Hole-03-Holeplace_2
+  - first:
+      213: -5752243673544282122
+    second: Fall-Hole-03-Holeplace_3
+  - first:
+      213: -1800154244376167225
+    second: Fall-Hole-03-Holeplace_4
+  - first:
+      213: -1471692538452305355
+    second: Fall-Hole-03-Holeplace_5
+  - first:
+      213: -4406396493738998357
+    second: Fall-Hole-03-Holeplace_6
+  - first:
+      213: -6019277145232281053
+    second: Fall-Hole-03-Holeplace_7
+  - first:
+      213: 6845105963510839761
+    second: Fall-Hole-03-Holeplace_8
+  - first:
+      213: 272041601359804386
+    second: Fall-Hole-03-Holeplace_9
+  - first:
+      213: -2326077159297393217
+    second: Fall-Hole-03-Holeplace_10
+  - first:
+      213: -1202616567345833581
+    second: Fall-Hole-03-Holeplace_11
+  - first:
+      213: 6397522348277782981
+    second: Fall-Hole-03-Holeplace_12
+  - first:
+      213: 4769135957127686773
+    second: Fall-Hole-03-Holeplace_13
+  - first:
+      213: 2294328758476479639
+    second: Fall-Hole-03-Holeplace_14
+  - first:
+      213: 3398492548214167326
+    second: Fall-Hole-03-Holeplace_15
+  - first:
+      213: 4484047486813470318
+    second: Fall-Hole-03-Holeplace_16
+  - first:
+      213: -8217635057834140984
+    second: Fall-Hole-03-Holeplace_17
+  - first:
+      213: 2158592944586154237
+    second: Fall-Hole-03-Holeplace_18
+  - first:
+      213: 7847884280203111944
+    second: Fall-Hole-03-Holeplace_19
+  - first:
+      213: 6715673303507660362
+    second: Fall-Hole-03-Holeplace_20
+  - first:
+      213: -159875386000222882
+    second: Fall-Hole-03-Holeplace_21
+  - first:
+      213: 8966664546945905014
+    second: Fall-Hole-03-Holeplace_22
+  - first:
+      213: -8160799034391999594
+    second: Fall-Hole-03-Holeplace_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_0
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 1059
+        width: 116
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4682c6d4ecf6ebb40800000000000000
+      internalID: 5457922730272499812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_1
+      rect:
+        serializedVersion: 2
+        x: 1012
+        y: 1070
+        width: 100
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cfac2044001cefc0800000000000000
+      internalID: -3464376402912170042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_2
+      rect:
+        serializedVersion: 2
+        x: 1056
+        y: 1054
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db791bb6eae036db0800000000000000
+      internalID: -4799976635552917571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_3
+      rect:
+        serializedVersion: 2
+        x: 792
+        y: 1018
+        width: 278
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ffa7e80bdceb20b0800000000000000
+      internalID: -5752243673544282122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_4
+      rect:
+        serializedVersion: 2
+        x: 850
+        y: 1049
+        width: 108
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ccfb0b90419407e0800000000000000
+      internalID: -1800154244376167225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_5
+      rect:
+        serializedVersion: 2
+        x: 964
+        y: 1044
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53a15f20f6f739be0800000000000000
+      internalID: -1471692538452305355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_6
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 1042
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba5092b2cb559d2c0800000000000000
+      internalID: -4406396493738998357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_7
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 1034
+        width: 121
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3227dc1f35b377ca0800000000000000
+      internalID: -6019277145232281053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_8
+      rect:
+        serializedVersion: 2
+        x: 1079
+        y: 1052
+        width: 100
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d9b8fc5b93befe50800000000000000
+      internalID: 6845105963510839761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_9
+      rect:
+        serializedVersion: 2
+        x: 787
+        y: 1011
+        width: 79
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e7fd25256c76c300800000000000000
+      internalID: 272041601359804386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_10
+      rect:
+        serializedVersion: 2
+        x: 1129
+        y: 1033
+        width: 33
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbdddefc52d18bfd0800000000000000
+      internalID: -2326077159297393217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_11
+      rect:
+        serializedVersion: 2
+        x: 1162
+        y: 1034
+        width: 60
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3991a5e8a927f4fe0800000000000000
+      internalID: -1202616567345833581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_12
+      rect:
+        serializedVersion: 2
+        x: 865
+        y: 1014
+        width: 15
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c958b32ea098c850800000000000000
+      internalID: 6397522348277782981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_13
+      rect:
+        serializedVersion: 2
+        x: 886
+        y: 997
+        width: 291
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57a632292ef5f2240800000000000000
+      internalID: 4769135957127686773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_14
+      rect:
+        serializedVersion: 2
+        x: 1079
+        y: 1017
+        width: 164
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79c14f699d717df10800000000000000
+      internalID: 2294328758476479639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_15
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 985
+        width: 138
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e171e1477fed92f20800000000000000
+      internalID: 3398492548214167326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_16
+      rect:
+        serializedVersion: 2
+        x: 977
+        y: 983
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6eff778e698a3e30800000000000000
+      internalID: 4484047486813470318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_17
+      rect:
+        serializedVersion: 2
+        x: 994
+        y: 974
+        width: 169
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cadffb247815fd80800000000000000
+      internalID: -8217635057834140984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_18
+      rect:
+        serializedVersion: 2
+        x: 1180
+        y: 992
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df0e8bca8dcd4fd10800000000000000
+      internalID: 2158592944586154237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_19
+      rect:
+        serializedVersion: 2
+        x: 1196
+        y: 995
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80ee0e74c2949ec60800000000000000
+      internalID: 7847884280203111944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_20
+      rect:
+        serializedVersion: 2
+        x: 1211
+        y: 998
+        width: 50
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4ee523d94dd23d50800000000000000
+      internalID: 6715673303507660362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_21
+      rect:
+        serializedVersion: 2
+        x: 875
+        y: 971
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e55d029fe2208cdf0800000000000000
+      internalID: -159875386000222882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_22
+      rect:
+        serializedVersion: 2
+        x: 893
+        y: 972
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 671bcc4e5edff6c70800000000000000
+      internalID: 8966664546945905014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fall-Hole-03-Holeplace_23
+      rect:
+        serializedVersion: 2
+        x: 922
+        y: 962
+        width: 157
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69bc6b714840fbe80800000000000000
+      internalID: -8160799034391999594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Fall-Hole-03-Holeplace_0: 5457922730272499812
+      Fall-Hole-03-Holeplace_1: -3464376402912170042
+      Fall-Hole-03-Holeplace_10: -2326077159297393217
+      Fall-Hole-03-Holeplace_11: -1202616567345833581
+      Fall-Hole-03-Holeplace_12: 6397522348277782981
+      Fall-Hole-03-Holeplace_13: 4769135957127686773
+      Fall-Hole-03-Holeplace_14: 2294328758476479639
+      Fall-Hole-03-Holeplace_15: 3398492548214167326
+      Fall-Hole-03-Holeplace_16: 4484047486813470318
+      Fall-Hole-03-Holeplace_17: -8217635057834140984
+      Fall-Hole-03-Holeplace_18: 2158592944586154237
+      Fall-Hole-03-Holeplace_19: 7847884280203111944
+      Fall-Hole-03-Holeplace_2: -4799976635552917571
+      Fall-Hole-03-Holeplace_20: 6715673303507660362
+      Fall-Hole-03-Holeplace_21: -159875386000222882
+      Fall-Hole-03-Holeplace_22: 8966664546945905014
+      Fall-Hole-03-Holeplace_23: -8160799034391999594
+      Fall-Hole-03-Holeplace_3: -5752243673544282122
+      Fall-Hole-03-Holeplace_4: -1800154244376167225
+      Fall-Hole-03-Holeplace_5: -1471692538452305355
+      Fall-Hole-03-Holeplace_6: -4406396493738998357
+      Fall-Hole-03-Holeplace_7: -6019277145232281053
+      Fall-Hole-03-Holeplace_8: 6845105963510839761
+      Fall-Hole-03-Holeplace_9: 272041601359804386
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
