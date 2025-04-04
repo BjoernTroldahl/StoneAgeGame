@@ -33,14 +33,12 @@ public class DragGrain : MonoBehaviour
     private bool isSnappedToCircle2 = false;
     private bool isMillingComplete = false;
     private bool canDragAfterMilling = false; // Indicates if user has clicked on grain after milling
-    //private bool waitingForPostMillingClick = false; // New flag to track post-milling click state
     private int flipCounter = 0;
     private BoxCollider2D millstoneCollider;
     private SpriteRenderer grainRenderer;
     private BoxCollider2D grainCollider; // Add reference to own collider
 
     // Static variables to track game state
-    //private static bool isSecondGrain = false;  // Track if this is the second grain
     private static bool firstGrainComplete = false;  // Track if first grain is done
     private static bool secondGrainComplete = false;  // Track if second grain is done
     private static bool isAnyGrainBeingDragged = false; // NEW: Track if any grain is currently being dragged
@@ -49,8 +47,7 @@ public class DragGrain : MonoBehaviour
     private static bool isCircle2Occupied = false; // Track if Circle 2 is occupied
     private static bool isCircle3Occupied = false; // Track if Circle 3 is occupied
     private static bool hasResetStaticVars = false;  // Add flag to track if we've reset vars this scene load
-    // Add a static flag to track if the first grain is fully complete
-    private static bool isFirstGrainFullyComplete = false;
+    private static bool isFirstGrainFullyComplete = false; // Add a static flag to track if the first grain is fully complete
     
     // Add field to store original sorting order
     private int defaultSortingOrder;
@@ -122,7 +119,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // Update each frame to check if second grain should be draggable
     void Update()
     {
         // Enable second grain's collider once first grain is complete
@@ -153,15 +149,15 @@ public class DragGrain : MonoBehaviour
             // Check for final position snap if milling is complete
             if (isMillingComplete && canDragAfterMilling)
             {
-                // Check for Circle 2 snap (for both grains)
-                if (Vector2.Distance(newPosition, circle2.position) < snapDistance)
+                // Check for Circle 2 snap (for both grains) - but only if it's not already occupied
+                if (Vector2.Distance(newPosition, circle2.position) < snapDistance && !isCircle2Occupied)
                 {
                     SnapToCircle2();
                     return;
                 }
                 
-                // Check for Circle 3 snap (for both grains)
-                if (Vector2.Distance(newPosition, circle3.position) < snapDistance)
+                // Check for Circle 3 snap (for both grains) - but only if it's not already occupied
+                if (Vector2.Distance(newPosition, circle3.position) < snapDistance && !isCircle3Occupied)
                 {
                     SnapToCircle3();
                     return;
@@ -258,6 +254,13 @@ public class DragGrain : MonoBehaviour
 
     private void SnapToCircle2()
     {
+        // Prevent snapping if already occupied
+        if (isCircle2Occupied)
+        {
+            Debug.LogWarning("Circle 2 is already occupied - cannot snap here");
+            return;
+        }
+
         transform.position = circle2.position;
         isSnappedToCircle2 = true;
         isDragging = false;
@@ -266,17 +269,19 @@ public class DragGrain : MonoBehaviour
         isAnyGrainBeingDragged = false;
         activeDraggedGrain = null;
         
-        // Mark Circle 2 as occupied
+        // Mark Circle 2 as occupied - this prevents other grains from snapping here
         isCircle2Occupied = true;
         
         // If this is the original grain, mark first grain as fully complete
         if (isOriginal)
         {
+            firstGrainComplete = true;
             isFirstGrainFullyComplete = true;
             Debug.Log("First grain fully complete - second grain can now be dragged");
-            
-            // No need to explicitly enable second grain collider here,
-            // the Update method will handle that
+        }
+        else
+        {
+            secondGrainComplete = true;
         }
         
         // Check if both circles are now occupied
@@ -287,6 +292,13 @@ public class DragGrain : MonoBehaviour
 
     private void SnapToCircle3()
     {
+        // Prevent snapping if already occupied
+        if (isCircle3Occupied)
+        {
+            Debug.LogWarning("Circle 3 is already occupied - cannot snap here");
+            return;
+        }
+
         transform.position = circle3.position;
         isSnappedToCircle2 = true;  // Reuse this flag for completion state
         isDragging = false;
@@ -295,14 +307,19 @@ public class DragGrain : MonoBehaviour
         isAnyGrainBeingDragged = false;
         activeDraggedGrain = null;
         
-        // Mark Circle 3 as occupied
+        // Mark Circle 3 as occupied - this prevents other grains from snapping here
         isCircle3Occupied = true;
         
         // If this is the original grain, mark first grain as fully complete
         if (isOriginal)
         {
+            firstGrainComplete = true;
             isFirstGrainFullyComplete = true;
             Debug.Log("First grain fully complete - second grain can now be dragged");
+        }
+        else
+        {
+            secondGrainComplete = true;
         }
         
         // Check if both circles are now occupied
@@ -311,7 +328,15 @@ public class DragGrain : MonoBehaviour
         Debug.Log($"Grain [{name}] snapped to Circle 3");
     }
 
-    // New method to track completion of both flours
+    private void ReturnToSafePosition()
+    {
+        // Return to a safe position when unable to snap to an occupied circle
+        // Move slightly away from the circle to prevent repeated attempts
+        Vector3 safePosition = transform.position + new Vector3(1f, 0, 0);
+        transform.position = safePosition;
+        Debug.Log($"Grain [{name}] moved to safe position - target was occupied");
+    }
+
     private void CheckBothFloursComplete()
     {
         Debug.Log($"Checking completion - First grain: {firstGrainComplete}, Second grain: {secondGrainComplete}");
@@ -357,7 +382,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // New method to check if both circles are occupied
     private void CheckCirclesOccupation()
     {
         Debug.Log($"Checking circle occupation - Circle2: {isCircle2Occupied}, Circle3: {isCircle3Occupied}");
@@ -387,7 +411,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // New method to spawn the second grain at start
     private void SpawnSecondGrainAtStart()
     {
         // Calculate position with offset
@@ -402,7 +425,6 @@ public class DragGrain : MonoBehaviour
         Debug.Log("Second grain spawned at start");
     }
     
-    // Add method to set as non-original
     public void SetAsNonOriginal()
     {
         isOriginal = false;
@@ -418,7 +440,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // New static method to reset all static variables
     private static void ResetAllStaticVariables()
     {
         firstGrainComplete = false;
@@ -477,6 +498,29 @@ public class DragGrain : MonoBehaviour
             // Reset the sorting order
             grainRenderer.sortingOrder = defaultSortingOrder;
             
+            // Check if near an occupied circle but not snapped
+            if (isMillingComplete && canDragAfterMilling)
+            {
+                Vector2 position2D = new Vector2(transform.position.x, transform.position.y);
+                Vector2 circle2Pos = new Vector2(circle2.position.x, circle2.position.y);
+                Vector2 circle3Pos = new Vector2(circle3.position.x, circle3.position.y);
+                
+                // If near Circle 2 but it's occupied
+                if (Vector2.Distance(position2D, circle2Pos) < snapDistance && isCircle2Occupied && 
+                    !isSnappedToCircle2)
+                {
+                    Debug.Log("Cannot snap to Circle 2 - already occupied");
+                    ReturnToSafePosition();
+                }
+                // If near Circle 3 but it's occupied
+                else if (Vector2.Distance(position2D, circle3Pos) < snapDistance && isCircle3Occupied && 
+                    !isSnappedToCircle2)
+                {
+                    Debug.Log("Cannot snap to Circle 3 - already occupied");
+                    ReturnToSafePosition();
+                }
+            }
+            
             // Only release the global lock if this grain is done (or if it's not the active one)
             if (isSnappedToCircle2 || activeDraggedGrain != this)
             {
@@ -487,7 +531,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // Add OnDestroy method to reset flag when scene is unloaded
     private void OnDestroy()
     {
         // Reset the hasResetStaticVars flag when the scene is unloaded
@@ -517,7 +560,6 @@ public class DragGrain : MonoBehaviour
         }
     }
 
-    // Called when a scene is loaded
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Reset variables when this scene is loaded
