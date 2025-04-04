@@ -6,18 +6,15 @@ using UnityEngine.SceneManagement;
 public class TorchFire : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private GameObject[] fireSprites;  // Assign fire sprites in inspector
+    [SerializeField] private ParticleSystem[] fireParticleSystems;  // Assign fire particle systems in inspector
     [SerializeField] private GameObject[] treeObjects;  // Add reference to tree objects
     [SerializeField] private float detectionRange = 2f; // Range at which torch triggers fire
     [SerializeField] private GameObject torch;          // Reference to the torch object
     [SerializeField] private float axeDetectionRange = 1.5f; // Range for axe to detect dead trees
 
-    [Header("Fire Animation")]
-    [SerializeField] private Sprite fire1Sprite;    // Assign fire1_0 sprite in inspector
-    [SerializeField] private Sprite fire2Sprite;    // Assign fire2_0 sprite in inspector
+    [Header("Tree Settings")]
     [SerializeField] private Sprite deadTreeSprite;    // Add this field
-    [SerializeField] private float switchInterval = 0.3f;
-    [SerializeField] private float burnDuration = 5f;
+    [SerializeField] private float burnDuration = 5f;  // How long the particle system runs before tree burns
 
     private Dictionary<GameObject, Coroutine> activeAnimations = new Dictionary<GameObject, Coroutine>();
     private HashSet<GameObject> burnedTrees = new HashSet<GameObject>();  // Track burned trees
@@ -26,18 +23,13 @@ public class TorchFire : MonoBehaviour
 
     private void Start()
     {
-        // Hide all fire sprites at start
-        foreach (GameObject fire in fireSprites)
+        // Stop and disable all fire particle systems at start
+        foreach (ParticleSystem fire in fireParticleSystems)
         {
             if (fire != null)
             {
-                SpriteRenderer spriteRenderer = fire.GetComponent<SpriteRenderer>();
-                if (spriteRenderer != null)
-                {
-                    Color color = spriteRenderer.color;
-                    color.a = 0f;
-                    spriteRenderer.color = color;
-                }
+                fire.Stop();
+                fire.gameObject.SetActive(false);
             }
         }
         
@@ -63,15 +55,15 @@ public class TorchFire : MonoBehaviour
         // Check for torch proximity to start fires
         if (!isAxe) // Only start fires if it's still a torch
         {
-            foreach (GameObject fire in fireSprites)
+            for (int i = 0; i < treeObjects.Length; i++)
             {
-                if (fire != null)
+                if (treeObjects[i] != null && i < fireParticleSystems.Length)
                 {
-                    float distance = Vector2.Distance(torch.transform.position, fire.transform.position);
+                    float distance = Vector2.Distance(torch.transform.position, treeObjects[i].transform.position);
                     
                     if (distance <= detectionRange)
                     {
-                        RevealFire(fire);
+                        StartTreeFire(treeObjects[i], fireParticleSystems[i]);
                     }
                 }
             }
@@ -97,77 +89,81 @@ public class TorchFire : MonoBehaviour
     private bool IsTreeBurned(GameObject tree)
     {
         int treeIndex = System.Array.IndexOf(treeObjects, tree);
-        return treeIndex >= 0 && treeIndex < fireSprites.Length && burnedTrees.Contains(fireSprites[treeIndex]);
+        return treeIndex >= 0 && burnedTrees.Contains(tree);
     }
 
-    private void RevealFire(GameObject fire)
+    private void StartTreeFire(GameObject tree, ParticleSystem fireParticles)
     {
-        // Skip if this tree is already burned
-        if (burnedTrees.Contains(fire))
+        // Skip if this tree is already burned or being burned
+        if (burnedTrees.Contains(tree) || activeAnimations.ContainsKey(tree))
         {
             return;
         }
 
-        SpriteRenderer spriteRenderer = fire.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && spriteRenderer.color.a < 1f)
+        // Start fire particle system
+        if (fireParticles != null)
         {
-            // Stop any existing animation for this fire
-            if (activeAnimations.ContainsKey(fire) && activeAnimations[fire] != null)
-            {
-                StopCoroutine(activeAnimations[fire]);
-            }
-
-            // Start new animation
-            Coroutine newAnimation = StartCoroutine(AnimateFire(fire));
-            activeAnimations[fire] = newAnimation;
-            Debug.Log($"Started fire animation for: {fire.name}");
+            // Activate and start the particle system
+            fireParticles.gameObject.SetActive(true);
+            fireParticles.Play();
+            
+            // Start coroutine to handle the burning process
+            Coroutine burningCoroutine = StartCoroutine(BurnTree(tree, fireParticles));
+            activeAnimations[tree] = burningCoroutine;
+            Debug.Log($"Started fire animation for tree: {tree.name}");
         }
     }
 
-    private IEnumerator AnimateFire(GameObject fire)
+    private IEnumerator BurnTree(GameObject tree, ParticleSystem fireParticles)
     {
-        SpriteRenderer spriteRenderer = fire.GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null) yield break;
-
-        // Find corresponding tree object
-        int fireIndex = System.Array.IndexOf(fireSprites, fire);
-        GameObject treeObject = fireIndex >= 0 && fireIndex < treeObjects.Length ? treeObjects[fireIndex] : null;
-        SpriteRenderer treeRenderer = treeObject?.GetComponent<SpriteRenderer>();
-
-        if (treeRenderer == null)
-        {
-            Debug.LogError($"No tree object found for fire: {fire.name}");
-            yield break;
-        }
-
-        // Make fire visible
-        Color color = spriteRenderer.color;
-        color.a = 1f;
-        spriteRenderer.color = color;
-
-        float elapsedTime = 0f;
-        bool useFirstSprite = true;
-
-        // Animate for burnDuration seconds
-        while (elapsedTime < burnDuration)
-        {
-            // Switch between sprites
-            spriteRenderer.sprite = useFirstSprite ? fire1Sprite : fire2Sprite;
-            useFirstSprite = !useFirstSprite;
-
-            yield return new WaitForSeconds(switchInterval);
-            elapsedTime += switchInterval;
-        }
+        // Wait for burn duration while particles are playing
+        yield return new WaitForSeconds(burnDuration);
 
         // Change tree to dead tree sprite
-        treeRenderer.sprite = deadTreeSprite;
-        burnedTrees.Add(fire);
+        SpriteRenderer treeRenderer = tree.GetComponent<SpriteRenderer>();
+        if (treeRenderer != null)
+        {
+            treeRenderer.sprite = deadTreeSprite;
+            burnedTrees.Add(tree);
+            Debug.Log($"Tree {tree.name} changed to dead tree");
+        }
 
-        // Hide fire effect
-        color.a = 0f;
-        spriteRenderer.color = color;
-        activeAnimations.Remove(fire);
-        Debug.Log($"Tree {treeObject.name} changed to dead tree");
+        // Gradually fade out the particle system
+        float fadeTime = 1.0f;
+        float elapsedTime = 0f;
+        ParticleSystem.MainModule main = fireParticles.main;
+        
+        // Store original start lifetime
+        float originalStartLifetime = main.startLifetime.constant;
+        
+        while (elapsedTime < fadeTime)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / fadeTime;
+            
+            // Gradually reduce particle lifetime to fade out
+            main.startLifetime = Mathf.Lerp(originalStartLifetime, 0, t);
+            
+            yield return null;
+        }
+        
+        // Stop emitting new particles but let existing ones finish
+        fireParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        
+        // Wait for all particles to die
+        yield return new WaitForSeconds(originalStartLifetime);
+        
+        // Disable the particle system completely
+        fireParticles.gameObject.SetActive(false);
+        
+        // Remove from active animations
+        activeAnimations.Remove(tree);
+        
+        // Check if all trees are burned
+        if (burnedTrees.Count == treeObjects.Length)
+        {
+            Debug.Log("All trees burned - player can now use axe to chop them");
+        }
     }
 
     private void HideDeadTree(GameObject tree)
@@ -186,10 +182,17 @@ public class TorchFire : MonoBehaviour
                 // Check if all burned trees are now hidden
                 if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)
                 {
-                    SceneManager.LoadScene(2); // Load the next scene
-                    Debug.Log("CONGRATS YOU WON THE GAME");
+                    Debug.Log("CONGRATS YOU WON THE GAME - Loading next scene in 2 seconds");
+                    StartCoroutine(DelayedSceneLoad());
                 }
             }
         }
+    }
+    
+    private IEnumerator DelayedSceneLoad()
+    {
+        // Wait for 2 seconds before loading next scene
+        yield return new WaitForSeconds(0f);
+        SceneManager.LoadScene(2); // Load the next scene
     }
 }

@@ -299,14 +299,28 @@ public class DragMilkVessel : MonoBehaviour
             Debug.Log("*************************************************");
             Debug.Log("*************** CONGRATS! YOU WON ***************");
             Debug.Log("*************************************************");
-            SceneManager.LoadScene(10); // Load the win scene
             
-            // You could add additional effects here
+            // Start coroutine to delay scene loading
+            StartCoroutine(DelayedWinSequence());
         }
         else
         {
             Debug.Log($"Not enough vessels completed yet, need {totalVessels - completedVessels} more");
         }
+    }
+
+    // New coroutine for delayed win sequence
+    private IEnumerator DelayedWinSequence()
+    {
+        // You could add visual effects here
+        Debug.Log("Starting win delay - will load next scene in 2 seconds");
+        
+        // Wait for 2 seconds
+        yield return new WaitForSeconds(1f);
+        
+        // Load the next scene
+        Debug.Log("Delay complete - Loading next scene");
+        SceneManager.LoadScene(10);
     }
 
     private IEnumerator MilkCowAnimation()
