@@ -1399,6 +1399,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Scene3-Bread-01-Raw_0
       objectReference: {fileID: 0}
+    - target: {fileID: 2532557936687255334, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
+      propertyPath: m_Size.y
+      value: 3.47
+      objectReference: {fileID: 0}
     - target: {fileID: 4478500842428837200, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
       propertyPath: circle1
       value: 
