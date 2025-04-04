@@ -156,6 +156,7 @@ MonoBehaviour:
   square4: {fileID: 0}
   square5: {fileID: 0}
   doughPrefab: {fileID: 1193977742861962876, guid: 13cf0ba4ecc3d1241a41bf8109fb581d, type: 3}
+  rawBreadSprite: {fileID: 0}
   breadHalfSprite: {fileID: 5594369475371137602, guid: b9edc3cb95449b14b9061d776330bdf0, type: 3}
   breadFinishedSprite: {fileID: -6208754568946728028, guid: ebe8dcc100a62bc46929c2e63f38dfbd, type: 3}
   spawnPosition: {x: 11.92, y: -0.15, z: 0}

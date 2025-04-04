@@ -16,9 +16,9 @@ public class DragDough : MonoBehaviour
     [SerializeField] private GameObject doughPrefab;
     
     [Header("Sprites")]
-    [SerializeField] private Sprite rawBreadSprite;    // NEW: Add this sprite for raw bread
-    [SerializeField] private Sprite breadHalfSprite;
-    [SerializeField] private Sprite breadFinishedSprite;
+    [SerializeField] private Sprite rawBreadSprite;    // Raw bread in the pan
+    [SerializeField] private Sprite breadHalfSprite;   // Half-cooked bread 
+    [SerializeField] private Sprite breadFinishedSprite; // Fully cooked bread
     
     [SerializeField] private Vector3 spawnPosition;
     [SerializeField] private Image backgroundImage;
@@ -61,7 +61,9 @@ public class DragDough : MonoBehaviour
         if (spriteRenderer != null)
         {
             defaultSortingOrder = spriteRenderer.sortingOrder;
+            // Ensure dough starts with flipY = FALSE
             spriteRenderer.flipY = false;
+            Debug.Log("Starting with flipY = FALSE (dough ball)");
         }
         
         if (doughCount == 0) spawnPosition = transform.position;
@@ -79,20 +81,20 @@ public class DragDough : MonoBehaviour
             {
                 isHalfCooked = true;
                 spriteRenderer.sprite = breadHalfSprite;
-                // Ensure Flip Y is DISABLED for half-cooked bread
-                spriteRenderer.flipY = false;
+                // When bread becomes half-cooked, set flipY = TRUE
+                spriteRenderer.flipY = true;
                 canFlip = true;
-                Debug.Log("Bread is half cooked - Click to flip");
+                Debug.Log("Bread is half cooked - Click to flip - flipY = TRUE");
             }
             // Second cooking phase after manual flip
-            else if (isHalfCooked && spriteRenderer.flipY && cookTimer >= cookingTime * 2)
+            else if (isHalfCooked && cookTimer >= cookingTime && !canFlip)
             {
                 isFullyCooked = true;
                 spriteRenderer.sprite = breadFinishedSprite;
-                // Ensure Flip Y is ENABLED for finished bread
+                // When bread is fully cooked, set flipY = TRUE (showing top side)
                 spriteRenderer.flipY = true;
                 isLocked = false; // Allow dragging to squares
-                Debug.Log("Bread is fully cooked - Ready for storage");
+                Debug.Log("Bread is fully cooked - Ready for storage - flipY = TRUE");
             }
         }
 
@@ -157,11 +159,12 @@ public class DragDough : MonoBehaviour
         // Handle flipping of half-cooked bread
         if (canFlip && isHalfCooked && !isFullyCooked)
         {
-            // Set Flip Y to ENABLED when manually flipping the half-cooked bread
-            spriteRenderer.flipY = true;
+            // When manually flipping the half-cooked bread, set flipY = FALSE (showing bottom side)
+            spriteRenderer.flipY = false;
             canFlip = false;
-            cookTimer = cookingTime; // Reset timer for second phase
-            Debug.Log("Bread flipped - Cooking second side");
+            // Reset timer for second phase of cooking
+            cookTimer = 0f; // Reset to 0 to start the second timer fresh
+            Debug.Log("Bread flipped - Cooking second side - flipY = FALSE");
             return;
         }
 
@@ -200,9 +203,9 @@ public class DragDough : MonoBehaviour
         if (rawBreadSprite != null && spriteRenderer != null)
         {
             spriteRenderer.sprite = rawBreadSprite;
-            // Set Flip Y to ENABLED for raw bread
-            spriteRenderer.flipY = true;
-            Debug.Log("Changed from dough ball to raw bread (with flipY enabled)");
+            // When bread is raw and placed in pan, set flipY = FALSE (showing raw top side)
+            spriteRenderer.flipY = false;
+            Debug.Log("Changed from dough ball to raw bread - flipY = FALSE");
         }
 
         switch (circleNumber)
@@ -225,7 +228,9 @@ public class DragDough : MonoBehaviour
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingOrder = squareNumber;
-            Debug.Log($"Set sorting order to {squareNumber} for bread in square {squareNumber}");
+            // Ensure fully cooked bread has flipY = TRUE when placed in storage
+            spriteRenderer.flipY = true;
+            Debug.Log($"Set sorting order to {squareNumber} for bread in square {squareNumber} - flipY = TRUE");
         }
 
         switch (squareNumber)
@@ -268,7 +273,7 @@ public class DragDough : MonoBehaviour
                     circle1, circle2, circle3,
                     square1, square2, square3, square4, square5,
                     doughPrefab, spawnPosition,
-                    rawBreadSprite, breadHalfSprite, breadFinishedSprite,  // Include raw bread sprite
+                    rawBreadSprite, breadHalfSprite, breadFinishedSprite,
                     backgroundImage, backgroundNoDoughSprite,
                     arrowSign
                 );
@@ -286,7 +291,7 @@ public class DragDough : MonoBehaviour
         Transform c1, Transform c2, Transform c3,
         Transform s1, Transform s2, Transform s3, Transform s4, Transform s5,
         GameObject prefab, Vector3 spawn, 
-        Sprite rawSprite, Sprite halfSprite, Sprite finishedSprite,  // Add rawSprite parameter
+        Sprite rawSprite, Sprite halfSprite, Sprite finishedSprite,
         Image background, Sprite noDoughSprite,
         SpriteRenderer arrow)
     {
@@ -300,7 +305,7 @@ public class DragDough : MonoBehaviour
         square5 = s5;
         doughPrefab = prefab;
         spawnPosition = spawn;
-        rawBreadSprite = rawSprite;         // Store the raw bread sprite
+        rawBreadSprite = rawSprite;
         breadHalfSprite = halfSprite;
         breadFinishedSprite = finishedSprite;
         backgroundImage = background;
@@ -311,5 +316,11 @@ public class DragDough : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
+        
+        // Reset sorting order when dropping objects that aren't fully cooked
+        if (!isLocked && !isFullyCooked && spriteRenderer != null)
+        {
+            spriteRenderer.sortingOrder = defaultSortingOrder;
+        }
     }
 }
