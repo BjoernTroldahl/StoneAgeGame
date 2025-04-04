@@ -34,6 +34,7 @@ public class DragMixingStick : MonoBehaviour
     private bool isComplete = false;
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer beerRenderer;
+    private BoxCollider2D boxCollider; // Add reference to box collider
 
     void Start()
     {
@@ -42,15 +43,37 @@ public class DragMixingStick : MonoBehaviour
         startRotation = transform.rotation;
         spriteRenderer = GetComponent<SpriteRenderer>();
         beerRenderer = beerVesselObject?.GetComponent<SpriteRenderer>();
+        boxCollider = GetComponent<BoxCollider2D>(); // Get reference to box collider
 
         if (mainCamera == null || spriteRenderer == null || beerRenderer == null)
         {
             Debug.LogError("Missing required references!");
         }
+
+        // Disable box collider at the start of the game
+        if (boxCollider != null)
+        {
+            boxCollider.enabled = false;
+            Debug.Log("Mixing stick collider disabled at start");
+        }
+        else
+        {
+            Debug.LogError("BoxCollider2D missing on mixing stick!");
+        }
+
+        // Reset static variables when scene loads
+        IsMixingComplete = false;
     }
 
     void Update()
     {
+        // Check if honey has been added and update collider state
+        if (HoneyHasBeenAdded && boxCollider != null && !boxCollider.enabled && !isComplete)
+        {
+            boxCollider.enabled = true;
+            Debug.Log("Honey added - Mixing stick collider enabled for interaction");
+        }
+
         if (isMovingToSnap)
         {
             stateTimer += Time.deltaTime;
@@ -120,6 +143,14 @@ public class DragMixingStick : MonoBehaviour
                 isReturning = false;
                 isComplete = true;
                 IsMixingComplete = true;
+                
+                // Disable collider when mixing is complete
+                if (boxCollider != null)
+                {
+                    boxCollider.enabled = false;
+                    Debug.Log("Mixing complete - stick collider disabled");
+                }
+                
                 // Ensure final position and rotation are exact
                 transform.position = startPosition;
                 transform.rotation = startRotation;
@@ -148,7 +179,7 @@ public class DragMixingStick : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!isComplete && HoneyHasBeenAdded && !isStirring)
+        if (!isComplete && HoneyHasBeenAdded && !isStirring && !isReturning && !isMovingToSnap)
         {
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
@@ -160,9 +191,36 @@ public class DragMixingStick : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if (!isStirring)
+        if (!isStirring && !isReturning && !isMovingToSnap)
         {
             isDragging = false;
+            
+            // If the player drops the stick away from the beer, return to start position
+            if (isDragging)
+            {
+                transform.position = startPosition;
+                transform.rotation = startRotation;
+                Debug.Log("Mixing stick returned to start position");
+            }
+        }
+    }
+
+    // Add a public method to reset the stick if needed
+    public void ResetStick()
+    {
+        isDragging = false;
+        isStirring = false;
+        isReturning = false;
+        isMovingToSnap = false;
+        isComplete = false;
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+        
+        // Update box collider state based on whether honey has been added
+        if (boxCollider != null)
+        {
+            boxCollider.enabled = HoneyHasBeenAdded && !isComplete;
+            Debug.Log($"Mixing stick reset - collider enabled: {boxCollider.enabled}");
         }
     }
 }
