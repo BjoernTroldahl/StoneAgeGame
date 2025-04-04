@@ -15,12 +15,25 @@ public class BeerLid : MonoBehaviour
     private Vector3 startPosition;
     private SpriteRenderer arrowRenderer;
     private BoxCollider2D beerVesselCollider;
-    private bool hasDisabledCollider = false;
+    private BoxCollider2D lidCollider; // Reference to own collider
+    private bool hasDisabledBeerCollider = false;
 
     void Start()
     {
         mainCamera = Camera.main;
         startPosition = transform.position;
+        
+        // Get and disable own collider
+        lidCollider = GetComponent<BoxCollider2D>();
+        if (lidCollider != null)
+        {
+            lidCollider.enabled = false;
+            Debug.Log("Beer lid collider disabled at start");
+        }
+        else
+        {
+            Debug.LogError("BoxCollider2D not found on beer lid!");
+        }
         
         // Get arrow sign sprite renderer and disable it
         if (arrowSign != null)
@@ -45,12 +58,23 @@ public class BeerLid : MonoBehaviour
 
     void Update()
     {
-        // Check if mixing is complete and collider hasn't been disabled yet
-        if (DragMixingStick.IsMixingComplete && !hasDisabledCollider && beerVesselCollider != null)
+        // Check if mixing is complete
+        if (DragMixingStick.IsMixingComplete)
         {
-            beerVesselCollider.enabled = false;
-            hasDisabledCollider = true;
-            Debug.Log("Beer vessel collider disabled");
+            // Disable beer vessel collider if not already done
+            if (!hasDisabledBeerCollider && beerVesselCollider != null)
+            {
+                beerVesselCollider.enabled = false;
+                hasDisabledBeerCollider = true;
+                Debug.Log("Beer vessel collider disabled");
+            }
+            
+            // Enable lid collider if not already snapped
+            if (!isSnapped && lidCollider != null && !lidCollider.enabled)
+            {
+                lidCollider.enabled = true;
+                Debug.Log("Beer lid collider enabled - mixing complete");
+            }
         }
 
         // Only allow dragging if mixing is complete and not already snapped
@@ -77,6 +101,13 @@ public class BeerLid : MonoBehaviour
     {
         transform.position = snapPoint.position;
         isSnapped = true;
+        
+        // Disable collider when snapped
+        if (lidCollider != null)
+        {
+            lidCollider.enabled = false;
+            Debug.Log("Beer lid collider disabled after snapping");
+        }
         
         // Enable both the GameObject and its sprite renderer
         if (arrowSign != null && arrowRenderer != null)

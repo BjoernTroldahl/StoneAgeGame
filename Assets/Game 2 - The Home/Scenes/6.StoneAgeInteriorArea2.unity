@@ -227,7 +227,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 5
   m_Sprite: {fileID: -6975005648614878040, guid: fe9aad1cec5f799478743dca460e6c51, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1149,11 +1149,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beerVesselObject: {fileID: 2097044085}
+  pourCirclePoint: {fileID: 799322431}
   overlapDistance: 5
   honeyCovered: {fileID: 7182666906141016539, guid: 5acb056b81c65e24e934a2e0ef3933f9, type: 3}
   honeyUncovered: {fileID: -5556287936526995481, guid: 604fe94cdc84eef408d7eb006235ee53, type: 3}
   honeyEmpty: {fileID: 2904330074175250994, guid: e5f0a76bfee37ef47bb6e771a0b24bfe, type: 3}
   beerWithHoney: {fileID: -4073838067035069804, guid: 6c4f38cc86f19874faca0b8f0311ba89, type: 3}
+  moveToCircleDuration: 0.5
+  rotationDuration: 0.8
+  pouringDuration: 1.5
+  returnRotationDuration: 0.8
+  returnMoveDuration: 1.2
+  pouringAngle: 90
 --- !u!212 &938345534
 SpriteRenderer:
   m_ObjectHideFlags: 0
