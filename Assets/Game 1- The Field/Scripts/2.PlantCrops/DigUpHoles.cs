@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI; // Add if holes are UI Images
+using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement; 
 
@@ -14,10 +14,15 @@ public class DigUpHoles : MonoBehaviour
     [SerializeField] private GameObject hole6;
 
     [Header("Sprite References")]
-    [SerializeField] private Sprite dirtPileSprite; // Add this reference in inspector
+    [SerializeField] private Sprite dirtPileSprite;
+
+    [Header("Growth Sequence")]
+    [SerializeField] private GrowPlants growPlantsController;
+    private bool growthSequenceTriggered = false;
 
     private Dictionary<GameObject, bool> holes = new Dictionary<GameObject, bool>();
     private Dictionary<GameObject, bool> hasSnappedSeed = new Dictionary<GameObject, bool>();
+    private Dictionary<GameObject, bool> isDirtPile = new Dictionary<GameObject, bool>(); // NEW: Track dirt pile state
 
     void Start()
     {
@@ -40,7 +45,9 @@ public class DigUpHoles : MonoBehaviour
         if (spriteRenderer != null && boxCollider != null)
         {
             holes[hole] = false;
-            hasSnappedSeed[hole] = false; // Track if hole has a snapped seed
+            hasSnappedSeed[hole] = false;
+            isDirtPile[hole] = false; // NEW: Initialize dirt pile state to false
+            
             Color spriteColor = spriteRenderer.color;
             spriteColor.a = 0f;
             spriteRenderer.color = spriteColor;
@@ -71,7 +78,7 @@ public class DigUpHoles : MonoBehaviour
                         // First click - make hole visible
                         RevealHole(clickedObject);
                     }
-                    else if (hasSnappedSeed[clickedObject])
+                    else if (hasSnappedSeed[clickedObject] && !isDirtPile[clickedObject])
                     {
                         // Second click after seed is snapped - change to dirt pile
                         ChangeToDirtPile(clickedObject);
@@ -102,11 +109,14 @@ public class DigUpHoles : MonoBehaviour
             // Change sprite
             spriteRenderer.sprite = dirtPileSprite;
             
-            // Set Order in Layer to 4 (increased from 3)
+            // Set Order in Layer to 4
             spriteRenderer.sortingOrder = 4;
             
             // Set Scale
             hole.transform.localScale = new Vector3(1f, 1f, 1f);
+            
+            // Mark as dirt pile
+            isDirtPile[hole] = true; // NEW: Update the dirt pile state
             
             Debug.Log($"Changed {hole.name} to dirt pile with sorting order 4 and adjusted scale");
 
@@ -117,24 +127,50 @@ public class DigUpHoles : MonoBehaviour
 
     private void CheckGameCompletion()
     {
-        bool allHolesCovered = true;
+        bool allHolesCoveredWithDirt = true;
+        int dirtPileCount = 0;
         
-        // Check each hole's sprite
         foreach (GameObject hole in holes.Keys)
         {
-            SpriteRenderer spriteRenderer = hole.GetComponent<SpriteRenderer>();
-            if (spriteRenderer.sprite != dirtPileSprite)
+            if (!isDirtPile[hole]) // NEW: Check dirt pile state instead of visibility
             {
-                allHolesCovered = false;
-                break;
+                allHolesCoveredWithDirt = false;
+            }
+            else
+            {
+                dirtPileCount++;
             }
         }
         
-        if (allHolesCovered)
+        Debug.Log($"Dirt pile check: {dirtPileCount}/6 holes converted");
+        
+        if (allHolesCoveredWithDirt && !growthSequenceTriggered)
         {
-            Debug.Log("CONGRATS, YOU WON THE GAME");
-            SceneManager.LoadScene(3); // Load the next scene
+            growthSequenceTriggered = true;
+            Debug.Log("All holes are converted to dirt piles!");
+            
+            // Instead of immediately loading the next scene, trigger the growth sequence
+            if (growPlantsController != null)
+            {
+                // Subscribe to the event that will be triggered when growth is done
+                growPlantsController.onGrowthSequenceComplete.AddListener(CompleteScene);
+                
+                // Start the growth sequence
+                growPlantsController.StartGrowthSequence();
+            }
+            else
+            {
+                Debug.LogWarning("GrowPlants controller not assigned! Loading next scene immediately.");
+                CompleteScene();
+            }
         }
+    }
+
+    private void CompleteScene()
+    {
+        Debug.Log("CONGRATULATIONS, YOU WON THE GAME");
+        // Load the next scene
+        SceneManager.LoadScene(3);
     }
 
     public bool IsHoleVisible(GameObject hole)
