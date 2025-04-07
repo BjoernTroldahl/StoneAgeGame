@@ -1,0 +1,429 @@
+fileFormatVersion: 2
+guid: e812ce8f02f4ced42ae1f41b0d4b9d9e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6664905606959474341
+    second: Click alarm-02_0
+  - first:
+      213: 5386932782799540298
+    second: Click alarm-02_1
+  - first:
+      213: -6494592992557681283
+    second: Click alarm-02_2
+  - first:
+      213: -4535778549756178653
+    second: Click alarm-02_3
+  - first:
+      213: -5232854907203420620
+    second: Click alarm-02_4
+  - first:
+      213: 3305016523361152962
+    second: Click alarm-02_5
+  - first:
+      213: -2528165997688427713
+    second: Click alarm-02_6
+  - first:
+      213: 4205813199719055532
+    second: Click alarm-02_7
+  - first:
+      213: 1341351626718257276
+    second: Click alarm-02_8
+  - first:
+      213: -4148665655758728164
+    second: Click alarm-02_9
+  - first:
+      213: -2091781113598295408
+    second: Click alarm-02_10
+  - first:
+      213: 5750633816049021836
+    second: Click alarm-02_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Click alarm-02_0
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 1129
+        width: 310
+        height: 230
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a6245c56508e7c50800000000000000
+      internalID: 6664905606959474341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_1
+      rect:
+        serializedVersion: 2
+        x: 685
+        y: 1253
+        width: 230
+        height: 309
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a405ca323da32ca40800000000000000
+      internalID: 5386932782799540298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_2
+      rect:
+        serializedVersion: 2
+        x: 973
+        y: 1309
+        width: 97
+        height: 318
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d75bbd545129ed5a0800000000000000
+      internalID: -6494592992557681283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_3
+      rect:
+        serializedVersion: 2
+        x: 1130
+        y: 1255
+        width: 228
+        height: 309
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32f42f9c07dad01c0800000000000000
+      internalID: -4535778549756178653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_4
+      rect:
+        serializedVersion: 2
+        x: 1253
+        y: 1133
+        width: 309
+        height: 229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43efafecf2a2167b0800000000000000
+      internalID: -5232854907203420620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_5
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 973
+        width: 317
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2cfecbb6407cddd20800000000000000
+      internalID: 3305016523361152962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_6
+      rect:
+        serializedVersion: 2
+        x: 1311
+        y: 979
+        width: 315
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3b6f8e7b662aecd0800000000000000
+      internalID: -2528165997688427713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_7
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 685
+        width: 310
+        height: 230
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca047e062dc0e5a30800000000000000
+      internalID: 4205813199719055532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_8
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 483
+        width: 229
+        height: 310
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c702f6d92307d9210800000000000000
+      internalID: 1341351626718257276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_9
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 421
+        width: 95
+        height: 317
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1453a0119afc66c0800000000000000
+      internalID: -4148665655758728164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_10
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 485
+        width: 229
+        height: 310
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0924a10f82088f2e0800000000000000
+      internalID: -2091781113598295408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Click alarm-02_11
+      rect:
+        serializedVersion: 2
+        x: 1255
+        y: 689
+        width: 309
+        height: 229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8373feccfa5ecf40800000000000000
+      internalID: 5750633816049021836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Click alarm-02_0: 6664905606959474341
+      Click alarm-02_1: 5386932782799540298
+      Click alarm-02_10: -2091781113598295408
+      Click alarm-02_11: 5750633816049021836
+      Click alarm-02_2: -6494592992557681283
+      Click alarm-02_3: -4535778549756178653
+      Click alarm-02_4: -5232854907203420620
+      Click alarm-02_5: 3305016523361152962
+      Click alarm-02_6: -2528165997688427713
+      Click alarm-02_7: 4205813199719055532
+      Click alarm-02_8: 1341351626718257276
+      Click alarm-02_9: -4148665655758728164
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
