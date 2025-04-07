@@ -141,6 +141,7 @@ public class SecondInteraction : MonoBehaviour
                 // Hide immediately and disable collider
                 objectCollider.enabled = false;
                 spriteRenderer.enabled = false;
+                gameObject.SetActive(false); // Add this line
                 DebugLog("Object hidden immediately");
                 return;
             }
@@ -214,7 +215,7 @@ public class SecondInteraction : MonoBehaviour
         // Check if the colliding object is our target
         if (other.gameObject == targetObject)
         {
-            DebugLog("Target object overlapping! Hiding this object.");
+            spriteRenderer.enabled = false; // Make sure this happens!
             objectCollider.enabled = false;
             shouldHide = true;
         }
