@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement; // Add this import
 
 public class DragPorridge : MonoBehaviour
 {
@@ -35,13 +36,88 @@ public class DragPorridge : MonoBehaviour
     private SpriteRenderer porridgeRenderer;
     private bool isAnimating = false;
     private BoxCollider2D beerCollider;
+    
+    // Add static variables to track state and scene loading
+    private static bool sceneLoadListenerAdded = false;
 
     void Awake()
     {
+        // Add scene load listener (only once)
+        if (!sceneLoadListenerAdded)
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            sceneLoadListenerAdded = true;
+            Debug.Log("DragPorridge: Scene load listener added");
+        }
+        
         porridgeRenderer = GetComponent<SpriteRenderer>();
         if (porridgeRenderer == null)
         {
             Debug.LogError("SpriteRenderer not found on DragPorridge!");
+        }
+        
+        // Reset variables on Awake
+        ResetInstanceVariables();
+    }
+    
+    void OnDestroy()
+    {
+        // Clean up event subscription
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        sceneLoadListenerAdded = false;
+        
+        // Re-enable beer collider if it was disabled
+        if (beerCollider != null && !beerCollider.enabled)
+        {
+            beerCollider.enabled = true;
+            Debug.Log("Beer vessel collider re-enabled on porridge script destroy");
+        }
+        
+        Debug.Log("DragPorridge: Scene load listener removed");
+    }
+    
+    // Handle scene load events
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset instance variables when scene loads
+        ResetInstanceVariables();
+        
+        // Reset related static vars in other scripts
+        DragHoney.PorridgeHasBeenAdded = false;
+        
+        Debug.Log("DragPorridge: Variables reset on scene load");
+    }
+    
+    // Reset all instance variables to default values
+    private void ResetInstanceVariables()
+    {
+        isDragging = false;
+        offset = Vector3.zero;
+        isPorridgeUncovered = false;
+        isBeerUncovered = false;
+        isLocked = false;
+        isAnimating = false;
+        
+        // Reset porridge sprite if we have the renderer and covered sprite
+        if (porridgeRenderer != null && porridgeCovered != null)
+        {
+            porridgeRenderer.sprite = porridgeCovered;
+            Debug.Log("Porridge sprite reset to covered state");
+        }
+        
+        // Reset beer sprite if we have the renderer and covered sprite
+        if (beerRenderer != null && beerCovered != null)
+        {
+            beerRenderer.sprite = beerCovered;
+            Debug.Log("Beer sprite reset to covered state");
+        }
+        
+        // Reset transform if we have stored the starting position
+        if (startPosition != Vector3.zero)
+        {
+            transform.position = startPosition;
+            transform.rotation = Quaternion.identity;
+            Debug.Log("Porridge bowl position and rotation reset");
         }
     }
 
@@ -79,6 +155,9 @@ public class DragPorridge : MonoBehaviour
             pourCirclePoint.position = beerVesselObject.position + new Vector3(-0.5f, 0.5f, 0);
             Debug.LogWarning("Created default pour circle point. Consider assigning one in the inspector for better control.");
         }
+        
+        // Reset DragHoney.PorridgeHasBeenAdded to ensure proper state
+        DragHoney.PorridgeHasBeenAdded = false;
     }
 
     void Update()
@@ -270,12 +349,10 @@ public class DragPorridge : MonoBehaviour
         }
     }
     
-    private void OnDestroy()
+    // Add a public method to manually reset state if needed
+    public void ResetState()
     {
-        if (beerCollider != null && !beerCollider.enabled)
-        {
-            beerCollider.enabled = true;
-            Debug.Log("Beer vessel collider re-enabled on porridge script destroy");
-        }
+        ResetInstanceVariables();
+        Debug.Log("DragPorridge: Manually reset");
     }
 }

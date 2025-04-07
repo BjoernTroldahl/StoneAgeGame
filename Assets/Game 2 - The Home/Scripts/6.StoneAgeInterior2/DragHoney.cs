@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class DragHoney : MonoBehaviour
 {
@@ -36,6 +37,73 @@ public class DragHoney : MonoBehaviour
     // Add static flag to check if porridge has been added
     public static bool PorridgeHasBeenAdded { get; set; } = false;
 
+    // Static flag to ensure initialization happens only once per scene load
+    private static bool sceneLoadListenerAdded = false;
+
+    void Awake()
+    {
+        // Register for scene load events (only once)
+        if (!sceneLoadListenerAdded)
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            sceneLoadListenerAdded = true;
+            Debug.Log("DragHoney: Scene load listener added");
+        }
+
+        // Reset instance variables (for safety)
+        ResetInstanceVariables();
+    }
+
+    void OnDestroy()
+    {
+        // Clean up event subscription
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        sceneLoadListenerAdded = false;
+
+        // Re-enable the beer collider if it was disabled
+        if (beerCollider != null && !beerCollider.enabled)
+        {
+            beerCollider.enabled = true;
+            Debug.Log("Beer vessel collider re-enabled on honey script destroy");
+        }
+    }
+
+    // Reset all variables when scene loads
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset static variables
+        PorridgeHasBeenAdded = false;
+        Debug.Log("DragHoney: Static variables reset on scene load");
+
+        // Reset instance variables
+        ResetInstanceVariables();
+    }
+
+    // Reset all instance variables to default values
+    private void ResetInstanceVariables()
+    {
+        isDragging = false;
+        offset = Vector3.zero;
+        isUncovered = false;
+        isLocked = false;
+        isAnimating = false;
+
+        // Reset sprite if we have the renderer and covered sprite
+        if (honeyRenderer != null && honeyCovered != null)
+        {
+            honeyRenderer.sprite = honeyCovered;
+        }
+
+        // Reset transform if we have stored the starting position
+        if (startPosition != Vector3.zero)
+        {
+            transform.position = startPosition;
+            transform.rotation = Quaternion.identity;
+        }
+
+        Debug.Log("DragHoney: Instance variables reset");
+    }
+
     void Start()
     {
         mainCamera = Camera.main;
@@ -60,11 +128,20 @@ public class DragHoney : MonoBehaviour
         {
             GameObject circleObj = new GameObject("HoneyPouringCirclePoint");
             pourCirclePoint = circleObj.transform;
-            
+
             // Position it relative to the beer vessel
             pourCirclePoint.position = beerVesselObject.position + new Vector3(-0.5f, 0.5f, 0);
             Debug.LogWarning("Created default pour circle point for honey. Consider assigning one in the inspector for better control.");
         }
+
+        // Ensure sprite is set to default covered state at start
+        if (honeyRenderer != null && honeyCovered != null)
+        {
+            honeyRenderer.sprite = honeyCovered;
+        }
+
+        // Reset any static variables on Start for scenes that have this object in them by default
+        PorridgeHasBeenAdded = false;
     }
 
     void Update()
@@ -98,7 +175,7 @@ public class DragHoney : MonoBehaviour
             Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             offset = transform.position - mousePosition;
             isDragging = true;
-            
+
             // Temporarily disable the beer vessel's collider while dragging
             if (beerCollider != null)
             {
@@ -113,7 +190,7 @@ public class DragHoney : MonoBehaviour
         if (isDragging && !isAnimating)
         {
             isDragging = false;
-            
+
             // Re-enable the beer vessel's collider
             if (beerCollider != null)
             {
@@ -123,7 +200,7 @@ public class DragHoney : MonoBehaviour
 
             // Check if honey bowl overlaps with beer vessel
             float distanceToBeer = Vector2.Distance(transform.position, beerVesselObject.position);
-            
+
             if (distanceToBeer < overlapDistance)
             {
                 // Start the pouring animation
@@ -135,11 +212,11 @@ public class DragHoney : MonoBehaviour
     private IEnumerator PourAnimation()
     {
         isAnimating = true;
-        
+
         Vector3 originalPosition = transform.position;
         Quaternion originalRotation = transform.rotation;
         Vector3 circlePosition = pourCirclePoint.position;
-        
+
         // 1. First move to the circle position
         Debug.Log($"Moving honey to circle point at {circlePosition}");
         float elapsedTime = 0;
@@ -147,16 +224,16 @@ public class DragHoney : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float percentComplete = Mathf.SmoothStep(0, 1, elapsedTime / moveToCircleDuration);
-            
+
             // Move to the circle position without rotation
             transform.position = Vector3.Lerp(originalPosition, circlePosition, percentComplete);
-            
+
             yield return null;
         }
-        
+
         // Make sure we're exactly at the circle position
         transform.position = circlePosition;
-        
+
         // 2. Rotate around the circle center for pouring
         Debug.Log("Starting honey pour rotation around circle center");
         elapsedTime = 0;
@@ -164,28 +241,28 @@ public class DragHoney : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float percentComplete = elapsedTime / rotationDuration;
-            
+
             // Rotate around circle center
             float angle = Mathf.Lerp(0, pouringAngle, percentComplete);
             transform.position = circlePosition; // Keep at circle position
             transform.rotation = Quaternion.Euler(0, 0, angle);
-            
+
             yield return null;
         }
-        
+
         // Ensure final rotation is exact
         transform.rotation = Quaternion.Euler(0, 0, pouringAngle);
-        
+
         // 3. Hold for pouring duration
         Debug.Log("Holding honey pour position");
         yield return new WaitForSeconds(pouringDuration);
-        
+
         // Change sprites before rotating back
         honeyRenderer.sprite = honeyEmpty;
         beerRenderer.sprite = beerWithHoney;
         DragMixingStick.HoneyHasBeenAdded = true; // Enable mixing stick interaction
         Debug.Log("Honey emptied into beer vessel");
-        
+
         // 4. Rotate back to original orientation while still at circle position
         Debug.Log("Rotating honey vessel back to original orientation");
         elapsedTime = 0;
@@ -193,18 +270,18 @@ public class DragHoney : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float percentComplete = elapsedTime / returnRotationDuration;
-            
+
             // Rotate back at circle position
             float angle = Mathf.Lerp(pouringAngle, 0, percentComplete);
             transform.position = circlePosition; // Keep at circle position
             transform.rotation = Quaternion.Euler(0, 0, angle);
-            
+
             yield return null;
         }
-        
+
         // Ensure rotation is back to zero
         transform.rotation = originalRotation;
-        
+
         // 5. Move back to starting position
         Debug.Log("Moving honey vessel back to starting position");
         Vector3 currentPosition = transform.position;
@@ -213,15 +290,15 @@ public class DragHoney : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float percentComplete = Mathf.SmoothStep(0, 1, elapsedTime / returnMoveDuration);
-            
+
             transform.position = Vector3.Lerp(currentPosition, startPosition, percentComplete);
-            
+
             yield return null;
         }
-        
+
         // Ensure final position is exact
         transform.position = startPosition;
-        
+
         isLocked = true; // Lock the honey bowl after animation completes
         isAnimating = false;
         Debug.Log("Honey pouring animation complete and honey vessel locked");
@@ -236,13 +313,10 @@ public class DragHoney : MonoBehaviour
             Debug.Log("Beer vessel collider re-enabled on honey script disable");
         }
     }
-    
-    private void OnDestroy()
+
+    // Public method to manually reset state if needed
+    public void ResetState()
     {
-        if (beerCollider != null && !beerCollider.enabled)
-        {
-            beerCollider.enabled = true;
-            Debug.Log("Beer vessel collider re-enabled on honey script destroy");
-        }
+        ResetInstanceVariables();
     }
 }

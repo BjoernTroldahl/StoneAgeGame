@@ -23,7 +23,54 @@ public class BeerLid : MonoBehaviour
     private SpriteRenderer lidRenderer; // Reference to lid sprite renderer
     private int defaultSortingOrder = 0; // Default sorting order for lid
 
+    // Static property to track if lid is snapped
     public static bool IsLidSnapped { get; private set; } = false;
+
+    // Static flag to ensure initialization happens only once per scene load
+    private static bool sceneLoadListenerAdded = false;
+
+    void Awake()
+    {
+        // Reset the static property when the object is instantiated
+        if (!sceneLoadListenerAdded)
+        {
+            // Add a scene loaded event handler to reset static variables
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            sceneLoadListenerAdded = true;
+            Debug.Log("BeerLid: Scene load listener added");
+        }
+        
+        // Reset instance variables
+        ResetInstanceVariables();
+    }
+
+    // Method to handle scene load events
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset static variables when any scene is loaded
+        IsLidSnapped = false;
+        Debug.Log("BeerLid: Static variables reset on scene load");
+    }
+
+    // Reset instance variables
+    private void ResetInstanceVariables()
+    {
+        isDragging = false;
+        offset = Vector3.zero;
+        isSnapped = false;
+        hasDisabledBeerCollider = false;
+        defaultSortingOrder = 0;
+        Debug.Log("BeerLid: Instance variables reset");
+    }
+
+    void OnDestroy()
+    {
+        // Clean up event subscription when the instance is destroyed
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        sceneLoadListenerAdded = false;
+        IsLidSnapped = false;
+        Debug.Log("BeerLid: Cleaned up event handlers and reset static vars");
+    }
 
     void Start()
     {
@@ -68,6 +115,9 @@ public class BeerLid : MonoBehaviour
         {
             defaultSortingOrder = lidRenderer.sortingOrder;
         }
+        
+        // Also reset static var in Start in case scene is loaded with BeerLid already in it
+        IsLidSnapped = false;
     }
 
     void Update()
@@ -165,10 +215,5 @@ public class BeerLid : MonoBehaviour
     private void OnMouseUp()
     {
         isDragging = false;
-    }
-
-    private void OnDestroy()
-    {
-        IsLidSnapped = false;
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DragMixingStick : MonoBehaviour
 {
@@ -15,9 +16,12 @@ public class DragMixingStick : MonoBehaviour
     [SerializeField] private float returnMovementDuration = 1f;
     [SerializeField] private float moveToSnapDuration = 0.5f;
 
+    // Static variables
     public static bool HoneyHasBeenAdded { get; set; } = false;
     public static bool IsMixingComplete { get; private set; } = false;
+    private static bool sceneLoadListenerAdded = false;
 
+    // Instance variables
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
@@ -34,7 +38,69 @@ public class DragMixingStick : MonoBehaviour
     private bool isComplete = false;
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer beerRenderer;
-    private BoxCollider2D boxCollider; // Add reference to box collider
+    private BoxCollider2D boxCollider;
+
+    void Awake()
+    {
+        // Add scene load listener (only once)
+        if (!sceneLoadListenerAdded)
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            sceneLoadListenerAdded = true;
+            Debug.Log("MixingStick: Scene load listener added");
+        }
+        
+        // Reset instance variables for safety
+        ResetInstanceVariables();
+    }
+    
+    void OnDestroy()
+    {
+        // Clean up event subscription
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        sceneLoadListenerAdded = false;
+        Debug.Log("MixingStick: Scene load listener removed");
+    }
+    
+    // Reset when scene loads
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset static variables
+        HoneyHasBeenAdded = false;
+        IsMixingComplete = false;
+        
+        // Reset instance variables
+        ResetInstanceVariables();
+        
+        Debug.Log("MixingStick: Variables reset on scene load");
+    }
+    
+    // Reset all instance variables to default values
+    private void ResetInstanceVariables()
+    {
+        isDragging = false;
+        offset = Vector3.zero;
+        isStirring = false;
+        currentRotation = 0f;
+        completedRotations = 0;
+        isReturning = false;
+        isMovingToSnap = false;
+        stateTimer = 0f;
+        isComplete = false;
+        
+        // Reset transform if we have the starting position
+        if (startPosition != Vector3.zero)
+        {
+            transform.position = startPosition;
+            transform.rotation = startRotation;
+        }
+        
+        // Update collider state if reference exists
+        if (boxCollider != null)
+        {
+            boxCollider.enabled = false;
+        }
+    }
 
     void Start()
     {
@@ -43,7 +109,7 @@ public class DragMixingStick : MonoBehaviour
         startRotation = transform.rotation;
         spriteRenderer = GetComponent<SpriteRenderer>();
         beerRenderer = beerVesselObject?.GetComponent<SpriteRenderer>();
-        boxCollider = GetComponent<BoxCollider2D>(); // Get reference to box collider
+        boxCollider = GetComponent<BoxCollider2D>();
 
         if (mainCamera == null || spriteRenderer == null || beerRenderer == null)
         {
@@ -61,7 +127,8 @@ public class DragMixingStick : MonoBehaviour
             Debug.LogError("BoxCollider2D missing on mixing stick!");
         }
 
-        // Reset static variables when scene loads
+        // Reset static variables when scene loads (extra safety)
+        HoneyHasBeenAdded = false;
         IsMixingComplete = false;
     }
 
@@ -205,7 +272,7 @@ public class DragMixingStick : MonoBehaviour
         }
     }
 
-    // Add a public method to reset the stick if needed
+    // Expand the existing ResetStick method
     public void ResetStick()
     {
         isDragging = false;
@@ -213,6 +280,10 @@ public class DragMixingStick : MonoBehaviour
         isReturning = false;
         isMovingToSnap = false;
         isComplete = false;
+        currentRotation = 0f;
+        completedRotations = 0;
+        stateTimer = 0f;
+        
         transform.position = startPosition;
         transform.rotation = startRotation;
         
@@ -222,5 +293,13 @@ public class DragMixingStick : MonoBehaviour
             boxCollider.enabled = HoneyHasBeenAdded && !isComplete;
             Debug.Log($"Mixing stick reset - collider enabled: {boxCollider.enabled}");
         }
+    }
+    
+    // Add method to reset static variables
+    public static void ResetStaticVariables()
+    {
+        HoneyHasBeenAdded = false;
+        IsMixingComplete = false;
+        Debug.Log("MixingStick: Static variables manually reset");
     }
 }
