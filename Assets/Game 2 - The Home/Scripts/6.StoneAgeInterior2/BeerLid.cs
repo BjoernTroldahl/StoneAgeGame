@@ -121,7 +121,7 @@ public class BeerLid : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == arrowSign)
             {
                 Debug.Log("CONGRATS YOU COMPLETED THE BREWING!");
-                SceneManager.LoadScene(9); // Load the next level
+                SceneManager.LoadScene("7.Hearth"); // Load the next level
             }
         }
     }

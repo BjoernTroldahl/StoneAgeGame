@@ -139,7 +139,7 @@ public class DragDough : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
             {
                 Debug.Log("CONGRATS YOU BEAT THE LEVEL");
-                SceneManager.LoadScene(9); // Load the next level
+                SceneManager.LoadScene("8.AnimalShelter"); // Load the next level
             }
         }
     }

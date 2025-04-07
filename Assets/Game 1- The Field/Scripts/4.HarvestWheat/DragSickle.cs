@@ -274,7 +274,7 @@ public class DragSickle : MonoBehaviour
     private void LoadNextScene()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex + 1); // Load the next scene
+        SceneManager.LoadScene("EndScreen1"); // Load the next scene
     }
     
     // Modified HideWheat method - no longer checks for victory condition

@@ -193,7 +193,7 @@ public class DragGrain : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == sharedArrowSign.gameObject)
             {
                 Debug.Log("CONGRATS YOU WON THE LEVEL");
-                SceneManager.LoadScene(7);
+                SceneManager.LoadScene("6.StoneAgeInteriorArea2");
             }
         }
     }

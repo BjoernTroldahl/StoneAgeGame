@@ -170,7 +170,7 @@ public class DigUpHoles : MonoBehaviour
     {
         Debug.Log("CONGRATULATIONS, YOU WON THE GAME");
         // Load the next scene
-        SceneManager.LoadScene(3);
+        SceneManager.LoadScene("3.WaterCrops");
     }
 
     public bool IsHoleVisible(GameObject hole)

@@ -8,7 +8,7 @@ public class ArrowSign : MonoBehaviour
         if (gameObject.activeSelf)
         {
             Debug.Log("CONGRATS YOU WON THE LEVEL");
-            SceneManager.LoadScene(8);
+            SceneManager.LoadScene("7.Hearth");
         }
     }
 }

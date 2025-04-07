@@ -193,6 +193,6 @@ public class TorchFire : MonoBehaviour
     {
         // Wait for 2 seconds before loading next scene
         yield return new WaitForSeconds(0f);
-        SceneManager.LoadScene(2); // Load the next scene
+        SceneManager.LoadScene("2.PlantCrops"); // Load the next scene
     }
 }

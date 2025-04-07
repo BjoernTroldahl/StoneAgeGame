@@ -320,7 +320,7 @@ public class DragMilkVessel : MonoBehaviour
         
         // Load the next scene
         Debug.Log("Delay complete - Loading next scene");
-        SceneManager.LoadScene(10);
+        SceneManager.LoadScene("EndScreen2");
     }
 
     private IEnumerator MilkCowAnimation()

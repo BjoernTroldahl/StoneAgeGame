@@ -245,7 +245,7 @@ public class WaterVesselController : MonoBehaviour
                     if (wateredSeedlings.Count == seedlingPoints.Count)
                     {
                         Debug.Log("CONGRATULATIONS, YOU WON THE GAME");
-                        SceneManager.LoadScene(4); // Load the next scene
+                        SceneManager.LoadScene("4.HarvestWheat"); // Load the next scene
                     }
                 }
             }
