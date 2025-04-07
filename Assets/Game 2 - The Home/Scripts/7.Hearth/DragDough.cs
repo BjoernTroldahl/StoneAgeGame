@@ -16,9 +16,9 @@ public class DragDough : MonoBehaviour
     [SerializeField] private GameObject doughPrefab;
     
     [Header("Sprites")]
-    [SerializeField] private Sprite rawBreadSprite;    // Raw bread in the pan
-    [SerializeField] private Sprite breadHalfSprite;   // Half-cooked bread 
-    [SerializeField] private Sprite breadFinishedSprite; // Fully cooked bread
+    [SerializeField] private Sprite rawBreadSprite;   
+    [SerializeField] private Sprite breadHalfSprite;   
+    [SerializeField] private Sprite breadFinishedSprite;
     
     [SerializeField] private Vector3 spawnPosition;
     [SerializeField] private Image backgroundImage;
@@ -30,6 +30,7 @@ public class DragDough : MonoBehaviour
     [SerializeField] private float cookingTime = 5f;
     private const int MAX_DOUGH = 5;
 
+    // Local instance variables
     private bool isDragging = false;
     private bool isLocked = false;
     private bool isHalfCooked = false;
@@ -40,8 +41,9 @@ public class DragDough : MonoBehaviour
     private Camera mainCamera;
     private SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
+    private bool isInitialDough = false;
 
-    // Static variables
+    // Static variables 
     private static bool circle1Locked = false;
     private static bool circle2Locked = false;
     private static bool circle3Locked = false;
@@ -51,6 +53,41 @@ public class DragDough : MonoBehaviour
     private static bool square4Occupied = false;
     private static bool square5Occupied = false;
     private static int doughCount = 0;
+    
+    // This will initialize all static variables
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void OnGameStart()
+    {
+        SceneManager.sceneLoaded += (scene, mode) => 
+        {
+            // Reset all statics when this specific scene is loaded
+            if (scene.name == "7.Hearth")
+            {
+                Debug.Log("SCENE LOAD CALLBACK: Resetting all static variables for Hearth scene");
+                circle1Locked = false;
+                circle2Locked = false;
+                circle3Locked = false;
+                square1Occupied = false;
+                square2Occupied = false;
+                square3Occupied = false;
+                square4Occupied = false;
+                square5Occupied = false;
+                doughCount = 0;
+            }
+        };
+    }
+
+    void Awake()
+    {
+        // Check if this is the initial dough in the scene
+        // The initial dough is the one that exists in the scene at start
+        // (not one that will be instantiated later)
+        if (doughCount == 0)
+        {
+            isInitialDough = true;
+            Debug.Log("Initial dough identified in Awake");
+        }
+    }
 
     void Start()
     {
@@ -61,13 +98,28 @@ public class DragDough : MonoBehaviour
         if (spriteRenderer != null)
         {
             defaultSortingOrder = spriteRenderer.sortingOrder;
-            // Ensure dough starts with flipY = FALSE
             spriteRenderer.flipY = false;
-            Debug.Log("Starting with flipY = FALSE (dough ball)");
         }
         
-        if (doughCount == 0) spawnPosition = transform.position;
-        doughCount++;
+        // Initial dough logic - always executes only once per scene load
+        if (isInitialDough)
+        {
+            spawnPosition = transform.position;
+            doughCount = 1; // Initial dough counts as 1
+            Debug.Log($"Initial dough initialized at position {spawnPosition}, doughCount set to {doughCount}");
+            
+            // Hide arrow sign at start
+            if (arrowSign != null)
+            {
+                arrowSign.enabled = false;
+                Debug.Log("Arrow sign hidden at start");
+            }
+        }
+        else
+        {
+            doughCount++; // Increment for subsequent doughs
+            Debug.Log($"Additional dough initialized. doughCount: {doughCount}");
+        }
     }
 
     void Update()
@@ -81,7 +133,6 @@ public class DragDough : MonoBehaviour
             {
                 isHalfCooked = true;
                 spriteRenderer.sprite = breadHalfSprite;
-                // When bread becomes half-cooked, set flipY = TRUE
                 spriteRenderer.flipY = true;
                 canFlip = true;
                 Debug.Log("Bread is half cooked - Click to flip - flipY = TRUE");
@@ -91,9 +142,8 @@ public class DragDough : MonoBehaviour
             {
                 isFullyCooked = true;
                 spriteRenderer.sprite = breadFinishedSprite;
-                // When bread is fully cooked, set flipY = TRUE (showing top side)
                 spriteRenderer.flipY = true;
-                isLocked = false; // Allow dragging to squares
+                isLocked = false;
                 Debug.Log("Bread is fully cooked - Ready for storage - flipY = TRUE");
             }
         }
@@ -139,7 +189,7 @@ public class DragDough : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject == arrowSign.gameObject)
             {
                 Debug.Log("CONGRATS YOU BEAT THE LEVEL");
-                SceneManager.LoadScene("8.AnimalShelter"); // Load the next level
+                SceneManager.LoadScene("8.AnimalShelter");
             }
         }
     }
@@ -159,11 +209,9 @@ public class DragDough : MonoBehaviour
         // Handle flipping of half-cooked bread
         if (canFlip && isHalfCooked && !isFullyCooked)
         {
-            // When manually flipping the half-cooked bread, set flipY = FALSE (showing bottom side)
             spriteRenderer.flipY = false;
             canFlip = false;
-            // Reset timer for second phase of cooking
-            cookTimer = 0f; // Reset to 0 to start the second timer fresh
+            cookTimer = 0f;
             Debug.Log("Bread flipped - Cooking second side - flipY = FALSE");
             return;
         }
@@ -179,10 +227,9 @@ public class DragDough : MonoBehaviour
             offset = transform.position - mousePosition;
             isDragging = true;
             
-            // Increase sorting order while dragging to appear on top
             if (spriteRenderer != null)
             {
-                spriteRenderer.sortingOrder = 10; // Higher than any stacked bread
+                spriteRenderer.sortingOrder = 10;
             }
             
             if (isFullyCooked)
@@ -199,11 +246,9 @@ public class DragDough : MonoBehaviour
         isDragging = false;
         cookTimer = 0f;
 
-        // Change sprite from dough ball to raw bread when snapped to a circle
         if (rawBreadSprite != null && spriteRenderer != null)
         {
             spriteRenderer.sprite = rawBreadSprite;
-            // When bread is raw and placed in pan, set flipY = FALSE (showing raw top side)
             spriteRenderer.flipY = false;
             Debug.Log("Changed from dough ball to raw bread - flipY = FALSE");
         }
@@ -224,11 +269,9 @@ public class DragDough : MonoBehaviour
         isLocked = true;
         isDragging = false;
 
-        // Set the sorting order based on the square number
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingOrder = squareNumber;
-            // Ensure fully cooked bread has flipY = TRUE when placed in storage
             spriteRenderer.flipY = true;
             Debug.Log($"Set sorting order to {squareNumber} for bread in square {squareNumber} - flipY = TRUE");
         }
@@ -245,11 +288,10 @@ public class DragDough : MonoBehaviour
                 {
                     arrowSign.enabled = true;
                     
-                    // Make sure arrow is on top of all bread
                     SpriteRenderer arrowRenderer = arrowSign.GetComponent<SpriteRenderer>();
                     if (arrowRenderer != null)
                     {
-                        arrowRenderer.sortingOrder = 6; // One higher than the highest bread
+                        arrowRenderer.sortingOrder = 6;
                     }
                     
                     Debug.Log("Final bread placed - Arrow sign enabled");
@@ -262,7 +304,7 @@ public class DragDough : MonoBehaviour
 
     private void SpawnNewDough()
     {
-        if (doughPrefab != null)
+        if (doughPrefab != null && doughCount < MAX_DOUGH)
         {
             GameObject newDough = Instantiate(doughPrefab, spawnPosition, Quaternion.identity);
             DragDough newDoughScript = newDough.GetComponent<DragDough>();
@@ -277,7 +319,7 @@ public class DragDough : MonoBehaviour
                     backgroundImage, backgroundNoDoughSprite,
                     arrowSign
                 );
-                Debug.Log($"Spawned dough #{doughCount + 1} of {MAX_DOUGH} with references");
+                Debug.Log($"Spawned dough #{doughCount} of {MAX_DOUGH} with references");
             }
             else
             {
@@ -286,7 +328,6 @@ public class DragDough : MonoBehaviour
         }
     }
 
-    // Add new method to set references
     public void SetReferences(
         Transform c1, Transform c2, Transform c3,
         Transform s1, Transform s2, Transform s3, Transform s4, Transform s5,
@@ -317,7 +358,6 @@ public class DragDough : MonoBehaviour
     {
         isDragging = false;
         
-        // Reset sorting order when dropping objects that aren't fully cooked
         if (!isLocked && !isFullyCooked && spriteRenderer != null)
         {
             spriteRenderer.sortingOrder = defaultSortingOrder;

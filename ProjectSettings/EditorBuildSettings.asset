@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game 2 - The Home/Scenes/EndScreen2.unity
     guid: f05b1a8a5d7c1b54b840f1392b5929ff
+  - enabled: 1
+    path: Assets/Start Menu/FINALscene.unity
+    guid: 211c3823270907d4990facd497186ecc
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
