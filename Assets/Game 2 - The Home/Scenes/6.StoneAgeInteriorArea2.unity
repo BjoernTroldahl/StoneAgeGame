@@ -1578,6 +1578,9 @@ MonoBehaviour:
   stirRadius: 0.5
   returnMovementDuration: 1
   moveToSnapDuration: 0.5
+  stirringSound: {fileID: 8300000, guid: 93f6e0a10118b794cb439be50d2879f6, type: 3}
+  stirringVolume: 0.7
+  loopStirringSound: 1
 --- !u!1 &799322429
 GameObject:
   m_ObjectHideFlags: 0

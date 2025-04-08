@@ -16,6 +16,11 @@ public class DragMixingStick : MonoBehaviour
     [SerializeField] private float returnMovementDuration = 1f;
     [SerializeField] private float moveToSnapDuration = 0.5f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip stirringSound;
+    [SerializeField] private float stirringVolume = 0.7f;
+    [SerializeField] private bool loopStirringSound = true;
+
     // Static variables
     public static bool HoneyHasBeenAdded { get; set; } = false;
     public static bool IsMixingComplete { get; private set; } = false;
@@ -39,6 +44,7 @@ public class DragMixingStick : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer beerRenderer;
     private BoxCollider2D boxCollider;
+    private AudioSource audioSource;
 
     void Awake()
     {
@@ -52,6 +58,16 @@ public class DragMixingStick : MonoBehaviour
         
         // Reset instance variables for safety
         ResetInstanceVariables();
+        
+        // Get or add AudioSource component
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.loop = loopStirringSound;
+            Debug.Log("MixingStick: AudioSource component added");
+        }
     }
     
     void OnDestroy()
@@ -71,6 +87,12 @@ public class DragMixingStick : MonoBehaviour
         
         // Reset instance variables
         ResetInstanceVariables();
+        
+        // Stop any playing audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
         
         Debug.Log("MixingStick: Variables reset on scene load");
     }
@@ -100,6 +122,12 @@ public class DragMixingStick : MonoBehaviour
         {
             boxCollider.enabled = false;
         }
+        
+        // Stop any playing audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 
     void Start()
@@ -114,6 +142,18 @@ public class DragMixingStick : MonoBehaviour
         if (mainCamera == null || spriteRenderer == null || beerRenderer == null)
         {
             Debug.LogError("Missing required references!");
+        }
+
+        // Configure audio source
+        if (audioSource != null)
+        {
+            audioSource.clip = stirringSound;
+            audioSource.volume = stirringVolume;
+            audioSource.loop = loopStirringSound;
+        }
+        else if (stirringSound != null)
+        {
+            Debug.LogWarning("AudioSource component missing, but stirring sound is assigned!");
         }
 
         // Disable box collider at the start of the game
@@ -155,11 +195,25 @@ public class DragMixingStick : MonoBehaviour
                 stateTimer = 0f;
                 currentRotation = 0f;
                 completedRotations = 0;
+                
+                // Start playing stirring sound when stirring begins
+                if (audioSource != null && stirringSound != null)
+                {
+                    audioSource.Play();
+                    Debug.Log("Stirring sound started");
+                }
+                
                 Debug.Log("Reached snap point, starting stirring motion");
             }
         }
         else if (isStirring)
         {
+            // Make sure audio is playing during stirring
+            if (audioSource != null && stirringSound != null && !audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+            
             currentRotation += rotationSpeed * Time.deltaTime;
             float rad = currentRotation * Mathf.Deg2Rad;
             
@@ -183,7 +237,13 @@ public class DragMixingStick : MonoBehaviour
                     isReturning = true;
                     stateTimer = 0f;
                     moveStartPosition = transform.position;
-                    // Don't change rotation here, let the lerp handle it
+                    
+                    // Stop stirring sound when stirring is complete
+                    if (audioSource != null && audioSource.isPlaying)
+                    {
+                        audioSource.Stop();
+                        Debug.Log("Stirring sound stopped");
+                    }
 
                     if (beerRenderer != null && mixedBeerSprite != null)
                     {
@@ -197,6 +257,12 @@ public class DragMixingStick : MonoBehaviour
         }
         else if (isReturning)
         {
+            // Make sure audio is stopped if we're not stirring anymore
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+            
             stateTimer += Time.deltaTime;
             float t = Mathf.Clamp01(stateTimer / returnMovementDuration); // Ensure t is between 0 and 1
             
@@ -240,6 +306,14 @@ public class DragMixingStick : MonoBehaviour
                 snapPosition = beerVesselObject.position;
                 transform.rotation = Quaternion.Euler(0, 0, -30); // Instantly rotate to -30 degrees
                 Debug.Log("Starting movement to snap point");
+            }
+        }
+        else
+        {
+            // Safety check - make sure audio is not playing if we're not stirring
+            if (audioSource != null && audioSource.isPlaying && !isStirring)
+            {
+                audioSource.Stop();
             }
         }
     }
@@ -292,6 +366,13 @@ public class DragMixingStick : MonoBehaviour
         {
             boxCollider.enabled = HoneyHasBeenAdded && !isComplete;
             Debug.Log($"Mixing stick reset - collider enabled: {boxCollider.enabled}");
+        }
+        
+        // Stop any playing audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("Audio stopped on reset");
         }
     }
     
