@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement; // Added for scene management
 
 public class BreadFire : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class BreadFire : MonoBehaviour
     [SerializeField] private float fireVolume = 0.6f; // Volume of the fire sound
     [SerializeField] private float fadeInDuration = 1.0f; // Time to fade in the fire sound
     [SerializeField] private float fadeOutDuration = 1.0f; // Time to fade out the fire sound
+    
+    [Header("Scene Settings")]
+    [SerializeField] private int targetSceneIndex = 8; // The scene where sound should play (scene 8)
     
     private SpriteRenderer spriteRenderer;
     private int currentSpriteIndex = 0;
@@ -54,6 +58,60 @@ public class BreadFire : MonoBehaviour
         
         // Initialize timer
         timeUntilNextChange = cycleTime;
+        
+        // Register for scene change events
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
+    
+    private void OnDestroy()
+    {
+        // Unsubscribe from events when object is destroyed
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
+        
+        // Make sure sound stops when object is destroyed
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+    }
+    
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Check if we're in the target scene
+        if (scene.buildIndex == targetSceneIndex)
+        {
+            // We're in scene 8, start the fire sound
+            StartFireSound();
+            Debug.Log($"Scene {targetSceneIndex} loaded - Starting fire sound");
+        }
+        else
+        {
+            // We're in a different scene, stop the fire sound immediately
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+                isFadingIn = false;
+                isFadingOut = false;
+                Debug.Log($"Scene {scene.buildIndex} loaded - Stopping fire sound immediately");
+            }
+        }
+    }
+    
+    private void OnSceneUnloaded(Scene scene)
+    {
+        // If we're leaving the target scene, stop the sound immediately
+        if (scene.buildIndex == targetSceneIndex)
+        {
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+                isFadingIn = false;
+                isFadingOut = false;
+                Debug.Log($"Scene {targetSceneIndex} unloaded - Stopping fire sound immediately");
+            }
+        }
     }
     
     private void SetupAudioSource()
@@ -75,35 +133,49 @@ public class BreadFire : MonoBehaviour
         targetVolume = fireVolume;
     }
     
-    private void OnEnable()
+    private void Start()
     {
-        // Start playing fire sound when object is enabled
-        StartFireSound();
+        // Check if we're already in the target scene when this object starts
+        if (SceneManager.GetActiveScene().buildIndex == targetSceneIndex)
+        {
+            StartFireSound();
+            Debug.Log($"Already in scene {targetSceneIndex} at start - Starting fire sound");
+        }
+        else
+        {
+            // We're not in the target scene, make sure sound is stopped
+            if (audioSource != null && audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+        }
     }
     
-    private void OnDisable()
-    {
-        // Stop fire sound when object is disabled
-        StopFireSound();
-    }
+    // We no longer need these since we're controlling sound based on scene events
+    // private void OnEnable() { ... }
+    // private void OnDisable() { ... }
 
     private void Update()
     {
-        // Update timer for sprite cycling
-        timeUntilNextChange -= Time.deltaTime;
-        
-        // Check if it's time to change sprites
-        if (timeUntilNextChange <= 0)
+        // Only process sprite cycling and sound if we're in the target scene
+        if (SceneManager.GetActiveScene().buildIndex == targetSceneIndex)
         {
-            // Reset timer
-            timeUntilNextChange = cycleTime;
+            // Update timer for sprite cycling
+            timeUntilNextChange -= Time.deltaTime;
             
-            // Change to next sprite
-            CycleToNextSprite();
+            // Check if it's time to change sprites
+            if (timeUntilNextChange <= 0)
+            {
+                // Reset timer
+                timeUntilNextChange = cycleTime;
+                
+                // Change to next sprite
+                CycleToNextSprite();
+            }
+            
+            // Handle sound fading
+            HandleSoundFading();
         }
-        
-        // Handle sound fading
-        HandleSoundFading();
     }
     
     private void HandleSoundFading()
@@ -158,22 +230,26 @@ public class BreadFire : MonoBehaviour
     
     public void StartFireSound()
     {
-        if (audioSource != null && fireAmbientSound != null)
+        // Only start sound if we're in the target scene
+        if (SceneManager.GetActiveScene().buildIndex == targetSceneIndex)
         {
-            // Reset fade states
-            isFadingOut = false;
-            isFadingIn = true;
-            
-            // Start playing if not already playing
-            if (!audioSource.isPlaying)
+            if (audioSource != null && fireAmbientSound != null)
             {
-                audioSource.Play();
-                Debug.Log("Started fire ambient sound");
+                // Reset fade states
+                isFadingOut = false;
+                isFadingIn = true;
+                
+                // Start playing if not already playing
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.Play();
+                    Debug.Log("Started fire ambient sound");
+                }
             }
-        }
-        else if (fireAmbientSound == null)
-        {
-            Debug.LogWarning("No fire ambient sound clip assigned!");
+            else if (fireAmbientSound == null)
+            {
+                Debug.LogWarning("No fire ambient sound clip assigned!");
+            }
         }
     }
     
@@ -181,14 +257,11 @@ public class BreadFire : MonoBehaviour
     {
         if (audioSource != null && audioSource.isPlaying)
         {
-            // Reset fade states
+            // Immediately stop sound without fading when leaving the scene
+            audioSource.Stop();
             isFadingIn = false;
-            isFadingOut = true;
-            
-            Debug.Log("Fading out fire ambient sound");
-            
-            // If we don't want fading, we would just do:
-            // audioSource.Stop();
+            isFadingOut = false;
+            Debug.Log("Stopped fire ambient sound immediately");
         }
     }
 }
