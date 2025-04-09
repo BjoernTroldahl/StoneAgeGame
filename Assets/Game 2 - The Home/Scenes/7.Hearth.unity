@@ -1613,6 +1613,7 @@ MonoBehaviour:
   fireVolume: 0.6
   fadeInDuration: 1
   fadeOutDuration: 1
+  targetSceneIndex: 8
 --- !u!212 &1441252239
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -272,7 +272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundMusic: {fileID: 8300000, guid: 7ef29cbf24e803f47acc09b00378a342, type: 3}
-  musicVolume: 0.5
+  musicVolume: 0.3
   fadeInDuration: 0
   fadeOutDuration: 0
   persistentScenes: 06000000070000000800000009000000
