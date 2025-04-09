@@ -6,20 +6,33 @@ using UnityEngine.SceneManagement;
 public class TorchFire : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private ParticleSystem[] fireParticleSystems;  // Assign fire particle systems in inspector
-    [SerializeField] private GameObject[] treeObjects;  // Add reference to tree objects
-    [SerializeField] private float detectionRange = 2f; // Range at which torch triggers fire
-    [SerializeField] private GameObject torch;          // Reference to the torch object
-    [SerializeField] private float axeDetectionRange = 1.5f; // Range for axe to detect dead trees
+    [SerializeField] private ParticleSystem[] fireParticleSystems;  
+    [SerializeField] private GameObject[] treeObjects;  
+    [SerializeField] private float detectionRange = 2f; 
+    [SerializeField] private GameObject torch;          
+    [SerializeField] private float axeDetectionRange = 1.5f; 
 
     [Header("Tree Settings")]
-    [SerializeField] private Sprite deadTreeSprite;    // Add this field
-    [SerializeField] private float burnDuration = 5f;  // How long the particle system runs before tree burns
+    [SerializeField] private Sprite deadTreeSprite;    
+    [SerializeField] private float burnDuration = 5f;  
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip fireSound;      
+    [SerializeField] private float fireSoundVolume = 0.7f; 
+    [SerializeField] private bool useSpatialSound = true;  
+    [SerializeField] private float maxSoundDistance = 20f;
+    
+    [Header("Axe Cutting Sound")]
+    [SerializeField] private AudioClip axeCuttingSound; // Sound when axe cuts tree
+    [SerializeField] private float axeSoundVolume = 0.8f; // Volume for axe sound
+    [SerializeField] private bool playSoundOnAllTrees = false; // If false, only plays once when last tree is cut
 
     private Dictionary<GameObject, Coroutine> activeAnimations = new Dictionary<GameObject, Coroutine>();
-    private HashSet<GameObject> burnedTrees = new HashSet<GameObject>();  // Track burned trees
-    private HashSet<GameObject> hiddenTrees = new HashSet<GameObject>();  // Track hidden trees
-    private Dragging torchScript; // Reference to the Dragging script
+    private Dictionary<GameObject, AudioSource> activeSounds = new Dictionary<GameObject, AudioSource>(); 
+    private HashSet<GameObject> burnedTrees = new HashSet<GameObject>();  
+    private HashSet<GameObject> hiddenTrees = new HashSet<GameObject>();  
+    private Dragging torchScript;
+    private AudioSource axeAudioSource; // Dedicated audio source for axe sounds
 
     private void Start()
     {
@@ -40,6 +53,25 @@ public class TorchFire : MonoBehaviour
             if (torchScript == null)
             {
                 Debug.LogError("Dragging script not found on torch object!");
+            }
+        }
+        
+        // Set up audio source for axe cutting sounds
+        if (axeCuttingSound != null)
+        {
+            axeAudioSource = gameObject.AddComponent<AudioSource>();
+            axeAudioSource.clip = axeCuttingSound;
+            axeAudioSource.volume = axeSoundVolume;
+            axeAudioSource.loop = false;
+            axeAudioSource.playOnAwake = false;
+            
+            // Configure spatial audio if needed
+            if (useSpatialSound)
+            {
+                axeAudioSource.spatialBlend = 0.7f; // Mostly 3D but with some 2D component
+                axeAudioSource.minDistance = 1.0f;
+                axeAudioSource.maxDistance = maxSoundDistance;
+                axeAudioSource.rolloffMode = AudioRolloffMode.Linear;
             }
         }
     }
@@ -100,12 +132,39 @@ public class TorchFire : MonoBehaviour
             return;
         }
 
-        // Start fire particle system
+        // Start fire particle system and audio
         if (fireParticles != null)
         {
             // Activate and start the particle system
             fireParticles.gameObject.SetActive(true);
             fireParticles.Play();
+            
+            // Create and play fire sound
+            if (fireSound != null && !activeSounds.ContainsKey(tree))
+            {
+                // Create audio source for this tree
+                AudioSource audioSource = tree.AddComponent<AudioSource>();
+                audioSource.clip = fireSound;
+                audioSource.volume = fireSoundVolume;
+                audioSource.loop = true;
+                
+                // Configure spatial audio if enabled
+                if (useSpatialSound)
+                {
+                    audioSource.spatialBlend = 1.0f; // Full 3D sound
+                    audioSource.minDistance = 1.0f;
+                    audioSource.maxDistance = maxSoundDistance;
+                    audioSource.rolloffMode = AudioRolloffMode.Linear;
+                }
+                else
+                {
+                    audioSource.spatialBlend = 0.0f; // 2D sound
+                }
+                
+                audioSource.Play();
+                activeSounds[tree] = audioSource;
+                Debug.Log($"Started fire sound for tree: {tree.name}");
+            }
             
             // Start coroutine to handle the burning process
             Coroutine burningCoroutine = StartCoroutine(BurnTree(tree, fireParticles));
@@ -128,13 +187,21 @@ public class TorchFire : MonoBehaviour
             Debug.Log($"Tree {tree.name} changed to dead tree");
         }
 
-        // Gradually fade out the particle system
+        // Gradually fade out the particle system and audio
         float fadeTime = 1.0f;
         float elapsedTime = 0f;
         ParticleSystem.MainModule main = fireParticles.main;
         
         // Store original start lifetime
         float originalStartLifetime = main.startLifetime.constant;
+        
+        // Get the audio source if it exists
+        AudioSource audioSource = null;
+        float originalVolume = fireSoundVolume;
+        if (activeSounds.TryGetValue(tree, out audioSource))
+        {
+            originalVolume = audioSource.volume;
+        }
         
         while (elapsedTime < fadeTime)
         {
@@ -144,11 +211,25 @@ public class TorchFire : MonoBehaviour
             // Gradually reduce particle lifetime to fade out
             main.startLifetime = Mathf.Lerp(originalStartLifetime, 0, t);
             
+            // Fade out audio if it exists
+            if (audioSource != null)
+            {
+                audioSource.volume = Mathf.Lerp(originalVolume, 0, t);
+            }
+            
             yield return null;
         }
         
         // Stop emitting new particles but let existing ones finish
         fireParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        
+        // Stop and clean up audio
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            Destroy(audioSource);
+            activeSounds.Remove(tree);
+        }
         
         // Wait for all particles to die
         yield return new WaitForSeconds(originalStartLifetime);
@@ -170,6 +251,10 @@ public class TorchFire : MonoBehaviour
     {
         if (!hiddenTrees.Contains(tree))
         {
+            // Play axe cutting sound if available
+            PlayAxeCuttingSound(tree);
+            
+            // Hide the tree
             SpriteRenderer treeRenderer = tree.GetComponent<SpriteRenderer>();
             if (treeRenderer != null)
             {
@@ -182,10 +267,37 @@ public class TorchFire : MonoBehaviour
                 // Check if all burned trees are now hidden
                 if (hiddenTrees.Count == burnedTrees.Count && burnedTrees.Count == treeObjects.Length)
                 {
-                    Debug.Log("CONGRATS YOU WON THE GAME - Loading next scene in 2 seconds");
+                    Debug.Log("CONGRATS YOU WON THE GAME");
                     StartCoroutine(DelayedSceneLoad());
                 }
             }
+        }
+    }
+    
+    private void PlayAxeCuttingSound(GameObject tree)
+    {
+        if (axeCuttingSound == null) return;
+        
+        // If we should play for every tree OR this is the final tree
+        bool isFinalTree = hiddenTrees.Count == burnedTrees.Count - 1 && burnedTrees.Count == treeObjects.Length;
+        
+        if (playSoundOnAllTrees || isFinalTree)
+        {
+            // Position audio source at tree location for spatial sound
+            if (useSpatialSound && tree != null)
+            {
+                axeAudioSource.transform.position = tree.transform.position;
+            }
+            
+            // If audio is already playing, stop it first
+            if (axeAudioSource.isPlaying)
+            {
+                axeAudioSource.Stop();
+            }
+            
+            // Play the cutting sound
+            axeAudioSource.PlayOneShot(axeCuttingSound, axeSoundVolume);
+            Debug.Log($"Playing axe cutting sound for tree: {tree.name}");
         }
     }
     
@@ -194,5 +306,18 @@ public class TorchFire : MonoBehaviour
         // Wait for 2 seconds before loading next scene
         yield return new WaitForSeconds(0f);
         SceneManager.LoadScene("2.PlantCrops"); // Load the next scene
+    }
+    
+    private void OnDestroy()
+    {
+        // Clean up all audio sources when destroyed
+        foreach (var audioSource in activeSounds.Values)
+        {
+            if (audioSource != null)
+            {
+                Destroy(audioSource);
+            }
+        }
+        activeSounds.Clear();
     }
 }

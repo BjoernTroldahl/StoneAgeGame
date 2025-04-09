@@ -2256,6 +2256,13 @@ MonoBehaviour:
   axeDetectionRange: 3.3
   deadTreeSprite: {fileID: 2075469651899464168, guid: 946de90964d74c74b9c9c8d18963743a, type: 3}
   burnDuration: 2
+  fireSound: {fileID: 8300000, guid: a37f2fa07463ba04e9134096058fa142, type: 3}
+  fireSoundVolume: 0.7
+  useSpatialSound: 0
+  maxSoundDistance: 20
+  axeCuttingSound: {fileID: 8300000, guid: e94b57d3e3cc40043979c976dbf2085b, type: 3}
+  axeSoundVolume: 0.8
+  playSoundOnAllTrees: 1
 --- !u!4 &1826559675
 Transform:
   m_ObjectHideFlags: 0
