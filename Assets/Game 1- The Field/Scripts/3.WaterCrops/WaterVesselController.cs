@@ -25,6 +25,12 @@ public class WaterVesselController : MonoBehaviour
     [SerializeField] private float waterRotationLeft = 270f;  // Rotation when watering from right to left (in degrees)
     [SerializeField] private float waterVelocityModifier = 1f; // Multiplier for particle velocity
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip waterPouringSound; // Sound of water pouring
+    [SerializeField] private float waterSoundVolume = 0.7f; // Volume for water sound
+    [SerializeField] private float waterFadeInTime = 0.25f; // Time to fade in the water sound
+    [SerializeField] private float waterFadeOutTime = 0.5f; // Time to fade out the water sound
+
     [Header("Grown Wheat Settings")]
     [SerializeField] private float grownWheatYOffset = 0.0f; // Vertical offset for grown wheat sprites
     [SerializeField] private float grownWheatXOffset = 0.0f; // Optional horizontal offset for grown wheat sprites
@@ -36,6 +42,7 @@ public class WaterVesselController : MonoBehaviour
     private HashSet<Transform> wateredSeedlings = new HashSet<Transform>();
     private ParticleSystem waterParticles;
     private Dictionary<Transform, Vector3> seedlingOriginalPositions = new Dictionary<Transform, Vector3>();
+    private AudioSource audioSource; // Audio source for water pouring sound
 
     public bool IsAnimating
     {
@@ -70,6 +77,13 @@ public class WaterVesselController : MonoBehaviour
         {
             Debug.LogWarning("Water particle system not assigned!");
         }
+        
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = waterPouringSound;
+        audioSource.loop = true;
+        audioSource.volume = 0; // Start silent
+        audioSource.playOnAwake = false;
     }
 
     private void OnMouseDown()
@@ -190,6 +204,9 @@ public class WaterVesselController : MonoBehaviour
             waterParticleSystem.SetActive(true);
             waterParticles.Play();
             Debug.Log($"Started water particle effect with rotation {waterRotationLeft}°");
+            
+            // Start playing water sound with fade-in
+            StartCoroutine(FadeInWaterSound());
         }
 
         yield return new WaitForSeconds(pouringDuration);
@@ -200,6 +217,9 @@ public class WaterVesselController : MonoBehaviour
             waterParticles.Stop();
             waterParticleSystem.SetActive(false);
             Debug.Log("Stopped water particle effect");
+            
+            // Fade out water sound
+            StartCoroutine(FadeOutWaterSound());
         }
 
         // Change seedling sprite and track it
@@ -272,5 +292,64 @@ public class WaterVesselController : MonoBehaviour
 
         transform.rotation = originalRotation;
         isAnimating = false;
+    }
+    
+    // Fade in water pouring sound
+    private IEnumerator FadeInWaterSound()
+    {
+        if (waterPouringSound != null && audioSource != null)
+        {
+            // Start playing at zero volume
+            audioSource.volume = 0f;
+            audioSource.Play();
+            
+            float timeElapsed = 0f;
+            
+            // Gradually increase volume during fadeInTime
+            while (timeElapsed < waterFadeInTime)
+            {
+                timeElapsed += Time.deltaTime;
+                float normalizedTime = Mathf.Clamp01(timeElapsed / waterFadeInTime);
+                audioSource.volume = Mathf.Lerp(0f, waterSoundVolume, normalizedTime);
+                yield return null;
+            }
+            
+            // Ensure we reach target volume
+            audioSource.volume = waterSoundVolume;
+            Debug.Log("Water pouring sound faded in");
+        }
+    }
+    
+    // Fade out water pouring sound
+    private IEnumerator FadeOutWaterSound()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            float startVolume = audioSource.volume;
+            float timeElapsed = 0f;
+            
+            // Gradually decrease volume during fadeOutTime
+            while (timeElapsed < waterFadeOutTime)
+            {
+                timeElapsed += Time.deltaTime;
+                float normalizedTime = Mathf.Clamp01(timeElapsed / waterFadeOutTime);
+                audioSource.volume = Mathf.Lerp(startVolume, 0f, normalizedTime);
+                yield return null;
+            }
+            
+            // Ensure we reach zero volume and stop playing
+            audioSource.volume = 0f;
+            audioSource.Stop();
+            Debug.Log("Water pouring sound faded out");
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        // Clean up audio when destroyed
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 }

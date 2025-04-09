@@ -11,10 +11,21 @@ public class SnapController : MonoBehaviour
     [SerializeField] private DigUpHoles holeController;
     [SerializeField] private List<GameObject> holes;  // Add holes in same order as snap points
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip seedSnapSound;  // Sound to play when seed snaps
+    [SerializeField] private float soundVolume = 0.7f; // Volume for sound effect
+    [SerializeField] private float pitchVariation = 0.1f; // Random pitch variation to add variety
+
     private Dictionary<Transform, bool> occupiedSnapPoints = new Dictionary<Transform, bool>();
+    private AudioSource audioSource;
 
     void Start()
     {
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.volume = soundVolume;
+
         if (holeController == null)
         {
             holeController = FindFirstObjectByType<DigUpHoles>();
@@ -64,9 +75,13 @@ public class SnapController : MonoBehaviour
 
         if (closestSnapPoint != null)
         {
+            // Snap the seed to the snap point
             draggableObject.transform.localPosition = closestSnapPoint.localPosition;
             occupiedSnapPoints[closestSnapPoint] = true;
             draggableObject.LockInPlace();
+            
+            // Play snap sound
+            PlaySnapSound();
             
             // Notify the hole that a seed has snapped to it
             int snapPointIndex = snapPoints.IndexOf(closestSnapPoint);
@@ -74,6 +89,29 @@ public class SnapController : MonoBehaviour
             {
                 holeController.NotifySeedSnapped(holes[snapPointIndex]);
             }
+            
+            Debug.Log($"Seed snapped to point {closestSnapPoint.name}");
         }
+    }
+    
+    // Play the snap sound with slight pitch variation for variety
+    private void PlaySnapSound()
+    {
+        if (seedSnapSound != null && audioSource != null)
+        {
+            // Add slight random pitch variation
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            
+            // Play the sound
+            audioSource.PlayOneShot(seedSnapSound, soundVolume);
+            
+            Debug.Log("Playing seed snap sound");
+        }
+    }
+    
+    // Public method for external access
+    public void PlaySeedSound()
+    {
+        PlaySnapSound();
     }
 }

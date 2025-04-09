@@ -2620,6 +2620,10 @@ MonoBehaviour:
   waterYOffset: 0
   waterRotationLeft: 180
   waterVelocityModifier: 1
+  waterPouringSound: {fileID: 8300000, guid: 597898c85b8bc2046af9c985a6f8f436, type: 3}
+  waterSoundVolume: 1
+  waterFadeInTime: 0.25
+  waterFadeOutTime: 0.5
   grownWheatYOffset: 0.8
   grownWheatXOffset: -0.1
 --- !u!1001 &2029623700

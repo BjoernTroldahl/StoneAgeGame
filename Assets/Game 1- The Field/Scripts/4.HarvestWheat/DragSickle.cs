@@ -19,6 +19,13 @@ public class DragSickle : MonoBehaviour
     [SerializeField] private Vector2 bundledWheatOffset = new Vector2(0f, -0.5f);
     [SerializeField] private Vector2 bundledWheatColliderSize = new Vector2(23f, 18f);
     
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip wheatCuttingSound; // Sound when wheat is cut
+    [SerializeField] private float cuttingSoundVolume = 0.8f; // Volume for cutting sound
+    [SerializeField] private float pitchVariation = 0.1f; // Slight pitch variation for variety
+    [SerializeField] private AudioClip wheatGatheringSound; // Sound when wheat is clicked/gathered
+    [SerializeField] private float gatheringSoundVolume = 0.7f; // Volume for gathering sound
+    
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
@@ -28,9 +35,15 @@ public class DragSickle : MonoBehaviour
     private float currentSwipeSpeed;
     private bool canHarvest = true;
     private float harvestTimer = 0f;
+    private AudioSource audioSource;
 
     void Start()
     {
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.volume = cuttingSoundVolume;
+        
         mainCamera = Camera.main;
         if (mainCamera == null)
         {
@@ -212,6 +225,9 @@ public class DragSickle : MonoBehaviour
     {
         Debug.Log($"BUNDLING WHEAT: {wheat.name} at position {wheat.transform.position}");
         
+        // Play wheat cutting sound
+        PlayWheatCuttingSound();
+        
         SpriteRenderer spriteRenderer = wheat.GetComponent<SpriteRenderer>();
         BoxCollider2D collider = wheat.GetComponent<BoxCollider2D>();
         
@@ -270,6 +286,38 @@ public class DragSickle : MonoBehaviour
         }
     }
     
+    // Method to play the wheat cutting sound
+    private void PlayWheatCuttingSound()
+    {
+        if (wheatCuttingSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(wheatCuttingSound, cuttingSoundVolume);
+            Debug.Log("Playing wheat cutting sound");
+        }
+        else if (wheatCuttingSound == null)
+        {
+            Debug.LogWarning("Wheat cutting sound clip is not assigned!");
+        }
+    }
+    
+    // Method to play the wheat gathering sound
+    private void PlayWheatGatheringSound()
+    {
+        if (wheatGatheringSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(wheatGatheringSound, gatheringSoundVolume);
+            Debug.Log("Playing wheat gathering sound");
+        }
+        else if (wheatGatheringSound == null)
+        {
+            Debug.LogWarning("Wheat gathering sound clip is not assigned!");
+        }
+    }
+    
     // New method to handle scene transition
     private void LoadNextScene()
     {
@@ -277,10 +325,13 @@ public class DragSickle : MonoBehaviour
         SceneManager.LoadScene("EndScreen1"); // Load the next scene
     }
     
-    // Modified HideWheat method - no longer checks for victory condition
+    // Modified HideWheat method - now plays gathering sound
     private void HideWheat(GameObject wheat)
     {
         Debug.Log($"HIDING WHEAT: {wheat.name} at position {wheat.transform.position}");
+        
+        // Play wheat gathering sound
+        PlayWheatGatheringSound();
         
         SpriteRenderer spriteRenderer = wheat.GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)

@@ -274,6 +274,9 @@ MonoBehaviour:
   - {fileID: 1397672671}
   - {fileID: 184443409}
   - {fileID: 1575970469}
+  seedSnapSound: {fileID: 8300000, guid: 9591cba0199d248468978123fba3bbf6, type: 3}
+  soundVolume: 0.7
+  pitchVariation: 0.1
 --- !u!4 &74535839
 Transform:
   m_ObjectHideFlags: 0
@@ -1491,6 +1494,7 @@ MonoBehaviour:
   hideImmediately: 1
   previousInteraction: {fileID: 333116107}
   activationDelay: 0
+  showDebugLogs: 1
 --- !u!1 &779982139
 GameObject:
   m_ObjectHideFlags: 0
@@ -4059,6 +4063,10 @@ MonoBehaviour:
   - {fileID: 1347639508}
   waitAfterPouchHide: 2
   plantDisplayDuration: 2
+  plantGrowthSound: {fileID: 8300000, guid: 3119007d3d38ea749984143b97af33ed, type: 3}
+  growthSoundVolume: 1
+  loopGrowthSound: 1
+  fadeOutDuration: 1
   onGrowthSequenceComplete:
     m_PersistentCalls:
       m_Calls: []
@@ -4287,6 +4295,9 @@ MonoBehaviour:
   hole5: {fileID: 184443409}
   hole6: {fileID: 1575970469}
   dirtPileSprite: {fileID: 6847770465293777364, guid: 291673fe0017f1948a4b45f241488e4e, type: 3}
+  digHoleSound: {fileID: 8300000, guid: b3865554601832a42b043fc2b7bcb6e7, type: 3}
+  coverWithDirtSound: {fileID: 8300000, guid: b3865554601832a42b043fc2b7bcb6e7, type: 3}
+  soundVolume: 0.7
   growPlantsController: {fileID: 1653653892}
 --- !u!4 &2063334563
 Transform:

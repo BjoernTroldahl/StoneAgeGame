@@ -2351,6 +2351,11 @@ MonoBehaviour:
   bundledWheatRotation: -90
   bundledWheatOffset: {x: 2, y: -1.5}
   bundledWheatColliderSize: {x: 3, y: 3.5}
+  wheatCuttingSound: {fileID: 8300000, guid: 20d4d7cd5e4537e4788029df1e9c958c, type: 3}
+  cuttingSoundVolume: 0.6
+  pitchVariation: 0.1
+  wheatGatheringSound: {fileID: 8300000, guid: ef26a5f5ba278064aab07feeed63194f, type: 3}
+  gatheringSoundVolume: 0.7
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

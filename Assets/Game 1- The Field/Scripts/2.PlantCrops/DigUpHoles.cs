@@ -16,6 +16,11 @@ public class DigUpHoles : MonoBehaviour
     [Header("Sprite References")]
     [SerializeField] private Sprite dirtPileSprite;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip digHoleSound;       // Sound when revealing a hole
+    [SerializeField] private AudioClip coverWithDirtSound; // Sound when changing to dirt pile
+    [SerializeField] private float soundVolume = 0.7f;     // Volume for sound effects
+
     [Header("Growth Sequence")]
     [SerializeField] private GrowPlants growPlantsController;
     private bool growthSequenceTriggered = false;
@@ -23,9 +28,17 @@ public class DigUpHoles : MonoBehaviour
     private Dictionary<GameObject, bool> holes = new Dictionary<GameObject, bool>();
     private Dictionary<GameObject, bool> hasSnappedSeed = new Dictionary<GameObject, bool>();
     private Dictionary<GameObject, bool> isDirtPile = new Dictionary<GameObject, bool>(); // NEW: Track dirt pile state
+    
+    // Audio source for playing hole-related sounds
+    private AudioSource audioSource;
 
     void Start()
     {
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.volume = soundVolume;
+        
         // Initialize dictionaries
         if (hole1) InitializeHole(hole1);
         if (hole2) InitializeHole(hole2);
@@ -93,6 +106,10 @@ public class DigUpHoles : MonoBehaviour
         SpriteRenderer spriteRenderer = hole.GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
+            // Play digging sound effect
+            PlaySound(digHoleSound);
+            
+            // Make hole visible
             Color spriteColor = spriteRenderer.color;
             spriteColor.a = 1f;
             spriteRenderer.color = spriteColor;
@@ -106,6 +123,9 @@ public class DigUpHoles : MonoBehaviour
         SpriteRenderer spriteRenderer = hole.GetComponent<SpriteRenderer>();
         if (spriteRenderer != null && dirtPileSprite != null)
         {
+            // Play dirt covering sound effect
+            PlaySound(coverWithDirtSound);
+            
             // Change sprite
             spriteRenderer.sprite = dirtPileSprite;
             
@@ -122,6 +142,21 @@ public class DigUpHoles : MonoBehaviour
 
             // Check if all holes are now dirt piles
             CheckGameCompletion();
+        }
+    }
+    
+    // Play a sound effect
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.clip = clip;
+            audioSource.Play();
+            Debug.Log($"Playing sound: {clip.name}");
+        }
+        else if (clip == null)
+        {
+            Debug.LogWarning("Attempted to play a null audio clip");
         }
     }
 
