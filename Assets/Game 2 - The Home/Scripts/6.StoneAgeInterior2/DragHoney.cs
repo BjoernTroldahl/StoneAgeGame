@@ -23,6 +23,14 @@ public class DragHoney : MonoBehaviour
     [SerializeField] private float returnMoveDuration = 1.2f;    // Time to move back to start position
     [SerializeField] private float pouringAngle = 90f;           // Angle to rotate for pouring
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip uncoverSound;             // Sound when uncovering honey
+    [SerializeField] private AudioClip honeyPourSound;           // Sound when pouring honey
+    [SerializeField] private float pourSoundVolume = 0.7f;       // Volume for pouring sound
+    [SerializeField] private float uncoverSoundVolume = 0.5f;    // Volume for uncovering sound
+    [SerializeField] private float fadeInTime = 0.3f;            // Time to fade in pouring sound
+    [SerializeField] private float fadeOutTime = 0.5f;           // Time to fade out pouring sound
+
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
@@ -33,6 +41,7 @@ public class DragHoney : MonoBehaviour
     private bool isLocked = false;
     private bool isAnimating = false;
     private BoxCollider2D beerCollider;
+    private AudioSource audioSource;  // Audio source component for playing sounds
 
     // Add static flag to check if porridge has been added
     public static bool PorridgeHasBeenAdded { get; set; } = false;
@@ -50,6 +59,12 @@ public class DragHoney : MonoBehaviour
             Debug.Log("DragHoney: Scene load listener added");
         }
 
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.volume = pourSoundVolume;
+
         // Reset instance variables (for safety)
         ResetInstanceVariables();
     }
@@ -65,6 +80,13 @@ public class DragHoney : MonoBehaviour
         {
             beerCollider.enabled = true;
             Debug.Log("Beer vessel collider re-enabled on honey script destroy");
+        }
+        
+        // Stop any playing sounds
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("Stopped audio on destroy");
         }
     }
 
@@ -99,6 +121,12 @@ public class DragHoney : MonoBehaviour
         {
             transform.position = startPosition;
             transform.rotation = Quaternion.identity;
+        }
+        
+        // Stop any playing audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
         }
 
         Debug.Log("DragHoney: Instance variables reset");
@@ -167,6 +195,10 @@ public class DragHoney : MonoBehaviour
             // First click - uncover the honey
             honeyRenderer.sprite = honeyUncovered;
             isUncovered = true;
+            
+            // Play uncover sound
+            PlaySoundEffect(uncoverSound, uncoverSoundVolume);
+            
             Debug.Log("Honey uncovered");
         }
         else
@@ -182,6 +214,22 @@ public class DragHoney : MonoBehaviour
                 beerCollider.enabled = false;
                 Debug.Log("Beer vessel collider temporarily disabled for honey dragging");
             }
+        }
+    }
+    
+    // Play a simple one-shot sound effect
+    private void PlaySoundEffect(AudioClip clip, float volume)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.clip = clip;
+            audioSource.volume = volume;
+            audioSource.PlayOneShot(clip, volume);
+            Debug.Log($"Playing sound: {clip.name}");
+        }
+        else if (clip == null)
+        {
+            Debug.LogWarning("Attempted to play a null audio clip");
         }
     }
 
@@ -252,10 +300,16 @@ public class DragHoney : MonoBehaviour
 
         // Ensure final rotation is exact
         transform.rotation = Quaternion.Euler(0, 0, pouringAngle);
+        
+        // Start the pouring sound with fade-in
+        StartCoroutine(FadeInPouringSound());
 
         // 3. Hold for pouring duration
         Debug.Log("Holding honey pour position");
         yield return new WaitForSeconds(pouringDuration);
+        
+        // Fade out pouring sound
+        StartCoroutine(FadeOutPouringSound());
 
         // Change sprites before rotating back
         honeyRenderer.sprite = honeyEmpty;
@@ -303,14 +357,78 @@ public class DragHoney : MonoBehaviour
         isAnimating = false;
         Debug.Log("Honey pouring animation complete and honey vessel locked");
     }
+    
+    // Fade in pouring sound
+    private IEnumerator FadeInPouringSound()
+    {
+        if (honeyPourSound != null && audioSource != null)
+        {
+            // Set up audio source
+            audioSource.clip = honeyPourSound;
+            audioSource.loop = true;
+            audioSource.volume = 0;
+            audioSource.Play();
+            
+            float startTime = Time.time;
+            float endTime = startTime + fadeInTime;
+            
+            // Gradually increase volume
+            while (Time.time < endTime)
+            {
+                float t = (Time.time - startTime) / fadeInTime;
+                audioSource.volume = Mathf.Lerp(0, pourSoundVolume, t);
+                yield return null;
+            }
+            
+            // Ensure we reach target volume
+            audioSource.volume = pourSoundVolume;
+            Debug.Log("Honey pouring sound at full volume");
+        }
+        else if (honeyPourSound == null)
+        {
+            Debug.LogWarning("Honey pour sound clip is not assigned!");
+        }
+    }
+    
+    // Fade out pouring sound
+    private IEnumerator FadeOutPouringSound()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            float startVolume = audioSource.volume;
+            float startTime = Time.time;
+            float endTime = startTime + fadeOutTime;
+            
+            // Gradually decrease volume
+            while (Time.time < endTime)
+            {
+                float t = (Time.time - startTime) / fadeOutTime;
+                audioSource.volume = Mathf.Lerp(startVolume, 0, t);
+                yield return null;
+            }
+            
+            // Ensure we reach zero volume and stop playing
+            audioSource.volume = 0;
+            audioSource.Stop();
+            audioSource.loop = false;
+            Debug.Log("Honey pouring sound faded out");
+        }
+    }
 
-    // If the game is paused or the scene changes, make sure to re-enable the beer collider
+    // If the game is paused or the scene changes, make sure to re-enable the beer collider and stop audio
     private void OnDisable()
     {
         if (beerCollider != null && !beerCollider.enabled)
         {
             beerCollider.enabled = true;
             Debug.Log("Beer vessel collider re-enabled on honey script disable");
+        }
+        
+        // Stop any playing audio
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("Stopped audio on disable");
         }
     }
 

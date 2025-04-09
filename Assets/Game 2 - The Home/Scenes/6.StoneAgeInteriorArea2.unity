@@ -379,6 +379,9 @@ MonoBehaviour:
   beerVessel: {fileID: 2097044083}
   snapDistance: 3
   seasonWheel: {fileID: 699458391}
+  lidSnapSound: {fileID: 8300000, guid: 45af35b898d000548b4154e841c57b2f, type: 3}
+  snapSoundVolume: 2
+  pitchVariation: 0.1
 --- !u!1 &151834219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1422,6 +1425,11 @@ MonoBehaviour:
   beerMixed4Sprite: {fileID: -1984748891730567335, guid: 18a4f4b01d7b0a943aba6eaa948742a8, type: 3}
   rotationDuration: 1.5
   seasonRotationAngle: 90
+  wheelRotationSound: {fileID: 8300000, guid: 48e95b3e463ab46429a26f8e3c456119, type: 3}
+  seasonCompleteSound: {fileID: 0}
+  rotationSoundVolume: 0.7
+  completeSoundVolume: 0.8
+  pitchVariation: 0.1
 --- !u!1 &742443239
 GameObject:
   m_ObjectHideFlags: 0
@@ -1954,6 +1962,12 @@ MonoBehaviour:
   returnRotationDuration: 0.8
   returnMoveDuration: 1.2
   pouringAngle: 90
+  uncoverSound: {fileID: 8300000, guid: 624ec60a6d5523d4999a8b0803c1eed7, type: 3}
+  honeyPourSound: {fileID: 8300000, guid: f4b662c2285d97f43870562da266fa03, type: 3}
+  pourSoundVolume: 0.7
+  uncoverSoundVolume: 0.5
+  fadeInTime: 0.3
+  fadeOutTime: 0.5
 --- !u!212 &938345534
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2116,6 +2130,12 @@ MonoBehaviour:
   returnRotationDuration: 0.8
   returnMoveDuration: 1.2
   pouringAngle: 90
+  uncoverSound: {fileID: 8300000, guid: 624ec60a6d5523d4999a8b0803c1eed7, type: 3}
+  pourSound: {fileID: 8300000, guid: 5e4b49a4b99867240ae4a5bccd3d9b75, type: 3}
+  pouringVolume: 0.7
+  uncoverVolume: 0.5
+  fadeInTime: 0.3
+  fadeOutTime: 0.5
 --- !u!61 &940318213
 BoxCollider2D:
   m_ObjectHideFlags: 0

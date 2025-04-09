@@ -16,6 +16,13 @@ public class SeasonWheel : MonoBehaviour
     [Header("Animation Settings")]
     [SerializeField] private float rotationDuration = 1.5f;
     [SerializeField] private float seasonRotationAngle = 90f;
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip wheelRotationSound; // Sound when wheel rotates
+    [SerializeField] private AudioClip seasonCompleteSound; // Sound when a season completes
+    [SerializeField] private float rotationSoundVolume = 0.7f; // Volume for rotation sound
+    [SerializeField] private float completeSoundVolume = 0.8f; // Volume for season complete sound
+    [SerializeField] private float pitchVariation = 0.1f; // Slight pitch variation for variety
     
     private int currentSeason = 0;
     private bool isAnimating = false;
@@ -23,7 +30,9 @@ public class SeasonWheel : MonoBehaviour
     private BoxCollider2D wheelCollider;
     private SpriteRenderer beerRenderer;
     private SpriteRenderer arrowRenderer;
-
+    private AudioSource audioSource; // Main audio source component
+    private AudioSource rotationAudioSource; // Dedicated audio source for rotation sound
+    
     void Start()
     {
         // Get components
@@ -31,6 +40,15 @@ public class SeasonWheel : MonoBehaviour
         wheelCollider = GetComponent<BoxCollider2D>();
         beerRenderer = beerVessel?.GetComponent<SpriteRenderer>();
         arrowRenderer = arrowSign?.GetComponent<SpriteRenderer>();
+        
+        // Set up main audio source for one-shot sounds
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        
+        // Set up dedicated audio source for rotation sound
+        rotationAudioSource = gameObject.AddComponent<AudioSource>();
+        rotationAudioSource.playOnAwake = false;
+        rotationAudioSource.loop = false;
         
         // Hide wheel and disable collider at start
         if (wheelRenderer != null)
@@ -83,9 +101,49 @@ public class SeasonWheel : MonoBehaviour
         StartCoroutine(RotateWheelForSeason());
     }
     
+    // Play wheel rotation sound at normal speed
+    private void PlayWheelRotationSound()
+    {
+        if (wheelRotationSound != null && rotationAudioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            rotationAudioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            
+            // Play sound with volume
+            rotationAudioSource.clip = wheelRotationSound;
+            rotationAudioSource.volume = rotationSoundVolume;
+            rotationAudioSource.Play();
+            
+            Debug.Log("Playing wheel rotation sound");
+        }
+        else if (wheelRotationSound == null)
+        {
+            Debug.LogWarning("Wheel rotation sound clip is not assigned!");
+        }
+    }
+    
+    // Play season complete sound with slight pitch variation
+    private void PlaySeasonCompleteSound()
+    {
+        if (seasonCompleteSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(seasonCompleteSound, completeSoundVolume);
+            Debug.Log("Playing season complete sound");
+        }
+        else if (seasonCompleteSound == null)
+        {
+            Debug.LogWarning("Season complete sound clip is not assigned!");
+        }
+    }
+    
     private IEnumerator RotateWheelForSeason()
     {
         isAnimating = true;
+        
+        // Play wheel rotation sound at the beginning of rotation
+        PlayWheelRotationSound();
         
         // Store current rotation
         Quaternion startRotation = transform.rotation;
@@ -109,11 +167,21 @@ public class SeasonWheel : MonoBehaviour
         // Ensure final rotation is exact
         transform.rotation = targetRotation;
         
+        // Stop rotation sound when rotation finishes, regardless of audio length
+        if (rotationAudioSource.isPlaying)
+        {
+            rotationAudioSource.Stop();
+            Debug.Log("Stopped wheel rotation sound after animation completed");
+        }
+        
         // Increment season counter
         currentSeason++;
         
         // Update beer sprite based on current season
         UpdateBeerSprite();
+        
+        // Play season complete sound after rotation and sprite update
+        PlaySeasonCompleteSound();
         
         // Check for final season completion
         if (currentSeason == 4)
@@ -173,5 +241,21 @@ public class SeasonWheel : MonoBehaviour
     public bool IsFermentationComplete()
     {
         return currentSeason >= 4;
+    }
+    
+    private void OnDisable()
+    {
+        // Stop any playing sounds when disabled
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+        
+        if (rotationAudioSource != null && rotationAudioSource.isPlaying)
+        {
+            rotationAudioSource.Stop();
+        }
+        
+        Debug.Log("Stopped all audio on disable");
     }
 }

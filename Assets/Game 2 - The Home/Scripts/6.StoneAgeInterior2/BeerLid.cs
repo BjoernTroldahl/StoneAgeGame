@@ -10,6 +10,11 @@ public class BeerLid : MonoBehaviour
     [SerializeField] private float snapDistance = 1f;
     [SerializeField] private SeasonWheel seasonWheel;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip lidSnapSound; // Sound when lid snaps to position
+    [SerializeField] private float snapSoundVolume = 0.7f; // Volume for snap sound
+    [SerializeField] private float pitchVariation = 0.1f; // Slight pitch variation
+
     private bool isDragging = false;
     private Vector3 offset;
     private Camera mainCamera;
@@ -19,6 +24,7 @@ public class BeerLid : MonoBehaviour
     private BoxCollider2D beerVesselCollider;
     private BoxCollider2D lidCollider; // Reference to own collider
     private bool hasDisabledBeerCollider = false;
+    private AudioSource audioSource; // Audio source component
 
     private SpriteRenderer lidRenderer; // Reference to lid sprite renderer
     private int defaultSortingOrder = 0; // Default sorting order for lid
@@ -39,6 +45,10 @@ public class BeerLid : MonoBehaviour
             sceneLoadListenerAdded = true;
             Debug.Log("BeerLid: Scene load listener added");
         }
+        
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
         
         // Reset instance variables
         ResetInstanceVariables();
@@ -195,9 +205,28 @@ public class BeerLid : MonoBehaviour
             lidCollider.enabled = false;
             Debug.Log("Beer lid collider disabled after snapping");
         }
+        
+        // Play lid snap sound
+        PlayLidSnapSound();
 
         // Don't show arrow yet - wait for season cycle to complete
         Debug.Log("Lid snapped to final position - Season wheel will appear");
+    }
+    
+    // Play lid snap sound with slight pitch variation
+    private void PlayLidSnapSound()
+    {
+        if (lidSnapSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(lidSnapSound, snapSoundVolume);
+            Debug.Log("Playing lid snap sound");
+        }
+        else if (lidSnapSound == null)
+        {
+            Debug.LogWarning("Lid snap sound clip is not assigned!");
+        }
     }
 
     private void OnMouseDown()
