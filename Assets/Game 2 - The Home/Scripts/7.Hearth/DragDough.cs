@@ -28,6 +28,14 @@ public class DragDough : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float snapDistance = 1f;
     [SerializeField] private float cookingTime = 5f;
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip doughSnapSound;       // Sound for dough snapping to circles
+    [SerializeField] private AudioClip breadSnapSound;       // Sound for bread snapping to squares
+    [SerializeField] private AudioClip breadFlipSound;       // Sound for flipping bread
+    [SerializeField] private float snapSoundVolume = 0.7f;   // Volume for snap sounds
+    [SerializeField] private float pitchVariation = 0.1f;    // Pitch variation for more natural sound
+    
     private const int MAX_DOUGH = 5;
 
     // Local instance variables
@@ -42,6 +50,7 @@ public class DragDough : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private int defaultSortingOrder;
     private bool isInitialDough = false;
+    private AudioSource audioSource;  // Audio source component
 
     // Static variables 
     private static bool circle1Locked = false;
@@ -87,6 +96,10 @@ public class DragDough : MonoBehaviour
             isInitialDough = true;
             Debug.Log("Initial dough identified in Awake");
         }
+        
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
     }
 
     void Start()
@@ -212,6 +225,10 @@ public class DragDough : MonoBehaviour
             spriteRenderer.flipY = false;
             canFlip = false;
             cookTimer = 0f;
+            
+            // Play bread flip sound
+            PlaySound(breadFlipSound, snapSoundVolume);
+            
             Debug.Log("Bread flipped - Cooking second side - flipY = FALSE");
             return;
         }
@@ -239,12 +256,31 @@ public class DragDough : MonoBehaviour
         }
     }
 
+    // Play sound with pitch variation
+    private void PlaySound(AudioClip clip, float volume)
+    {
+        if (clip != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(clip, volume);
+            Debug.Log($"Playing sound: {clip.name}");
+        }
+        else if (clip == null)
+        {
+            Debug.LogWarning("Attempted to play null audio clip");
+        }
+    }
+
     private void SnapToPosition(Vector3 position, int circleNumber)
     {
         transform.position = position;
         isLocked = true;
         isDragging = false;
         cookTimer = 0f;
+
+        // Play dough snap sound
+        PlaySound(doughSnapSound, snapSoundVolume);
 
         if (rawBreadSprite != null && spriteRenderer != null)
         {
@@ -268,6 +304,9 @@ public class DragDough : MonoBehaviour
         transform.position = position;
         isLocked = true;
         isDragging = false;
+
+        // Play bread snap sound
+        PlaySound(breadSnapSound, snapSoundVolume);
 
         if (spriteRenderer != null)
         {
@@ -302,39 +341,15 @@ public class DragDough : MonoBehaviour
         Debug.Log($"Bread stored in square {squareNumber}");
     }
 
-    private void SpawnNewDough()
-    {
-        if (doughPrefab != null && doughCount < MAX_DOUGH)
-        {
-            GameObject newDough = Instantiate(doughPrefab, spawnPosition, Quaternion.identity);
-            DragDough newDoughScript = newDough.GetComponent<DragDough>();
-            
-            if (newDoughScript != null)
-            {
-                newDoughScript.SetReferences(
-                    circle1, circle2, circle3,
-                    square1, square2, square3, square4, square5,
-                    doughPrefab, spawnPosition,
-                    rawBreadSprite, breadHalfSprite, breadFinishedSprite,
-                    backgroundImage, backgroundNoDoughSprite,
-                    arrowSign
-                );
-                Debug.Log($"Spawned dough #{doughCount} of {MAX_DOUGH} with references");
-            }
-            else
-            {
-                Debug.LogError("DragDough component not found on spawned prefab!");
-            }
-        }
-    }
-
+    // Update SetReferences to include audio references
     public void SetReferences(
         Transform c1, Transform c2, Transform c3,
         Transform s1, Transform s2, Transform s3, Transform s4, Transform s5,
         GameObject prefab, Vector3 spawn, 
         Sprite rawSprite, Sprite halfSprite, Sprite finishedSprite,
         Image background, Sprite noDoughSprite,
-        SpriteRenderer arrow)
+        SpriteRenderer arrow,
+        AudioClip dSnap = null, AudioClip bSnap = null, AudioClip bFlip = null)
     {
         circle1 = c1;
         circle2 = c2;
@@ -352,6 +367,39 @@ public class DragDough : MonoBehaviour
         backgroundImage = background;
         backgroundNoDoughSprite = noDoughSprite;
         arrowSign = arrow;
+        
+        // Set audio references if provided
+        if (dSnap != null) doughSnapSound = dSnap;
+        if (bSnap != null) breadSnapSound = bSnap;
+        if (bFlip != null) breadFlipSound = bFlip;
+    }
+
+    // Modified SpawnNewDough to pass audio clips
+    private void SpawnNewDough()
+    {
+        if (doughPrefab != null && doughCount < MAX_DOUGH)
+        {
+            GameObject newDough = Instantiate(doughPrefab, spawnPosition, Quaternion.identity);
+            DragDough newDoughScript = newDough.GetComponent<DragDough>();
+            
+            if (newDoughScript != null)
+            {
+                newDoughScript.SetReferences(
+                    circle1, circle2, circle3,
+                    square1, square2, square3, square4, square5,
+                    doughPrefab, spawnPosition,
+                    rawBreadSprite, breadHalfSprite, breadFinishedSprite,
+                    backgroundImage, backgroundNoDoughSprite,
+                    arrowSign,
+                    doughSnapSound, breadSnapSound, breadFlipSound  // Pass audio references to clones
+                );
+                Debug.Log($"Spawned dough #{doughCount} of {MAX_DOUGH} with references");
+            }
+            else
+            {
+                Debug.LogError("DragDough component not found on spawned prefab!");
+            }
+        }
     }
 
     private void OnMouseUp()
@@ -361,6 +409,16 @@ public class DragDough : MonoBehaviour
         if (!isLocked && !isFullyCooked && spriteRenderer != null)
         {
             spriteRenderer.sortingOrder = defaultSortingOrder;
+        }
+    }
+    
+    private void OnDisable()
+    {
+        // Stop any playing sounds when disabled
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("Stopped audio on disable");
         }
     }
 }

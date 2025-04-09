@@ -1609,6 +1609,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 87b2df9fb71dcad4ca2b541dfbc0bd00, type: 3}
   - {fileID: 21300000, guid: 0f29e151529082b40b74acbcfb77d21d, type: 3}
   cycleTime: 0.3
+  fireAmbientSound: {fileID: 8300000, guid: b497d999ba8cd4647abdcd91edc8007c, type: 3}
+  fireVolume: 0.6
+  fadeInDuration: 1
+  fadeOutDuration: 1
 --- !u!212 &1441252239
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2152,6 +2156,18 @@ PrefabInstance:
       propertyPath: doughPrefab
       value: 
       objectReference: {fileID: 1510443749254790875, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
+    - target: {fileID: 4478500842428837200, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
+      propertyPath: breadFlipSound
+      value: 
+      objectReference: {fileID: 8300000, guid: ff37cc63ff77c9646ba28ad80ebd2014, type: 3}
+    - target: {fileID: 4478500842428837200, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
+      propertyPath: breadSnapSound
+      value: 
+      objectReference: {fileID: 8300000, guid: ff37cc63ff77c9646ba28ad80ebd2014, type: 3}
+    - target: {fileID: 4478500842428837200, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
+      propertyPath: doughSnapSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 3a44d62e9870e2e4aa08e25daf9b80ba, type: 3}
     - target: {fileID: 4478500842428837200, guid: a7666de59f813d648aa40266e3d3e5f8, type: 3}
       propertyPath: backgroundImage
       value: 

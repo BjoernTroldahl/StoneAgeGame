@@ -1354,6 +1354,11 @@ MonoBehaviour:
   milkingAnimationDuration: 0.5
   defaultSortingOrder: 0
   dragSortingOrder: 4
+  targetSnapSound: {fileID: 8300000, guid: ff37cc63ff77c9646ba28ad80ebd2014, type: 3}
+  startSnapSound: {fileID: 8300000, guid: ff37cc63ff77c9646ba28ad80ebd2014, type: 3}
+  milkDropSound: {fileID: 8300000, guid: 2c0b5505abe5e9b49b730a00c3271c53, type: 3}
+  snapSoundVolume: 0.7
+  pitchVariation: 0.1
 --- !u!1 &1556114624
 GameObject:
   m_ObjectHideFlags: 0

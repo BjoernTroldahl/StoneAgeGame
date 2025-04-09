@@ -34,6 +34,13 @@ public class DragMilkVessel : MonoBehaviour
     [SerializeField] private int defaultSortingOrder = 0;   // Default order in layer 
     [SerializeField] private int dragSortingOrder = 4;      // Order in layer when dragging
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip targetSnapSound;     // Sound when snapping to target circle
+    [SerializeField] private AudioClip startSnapSound;      // Sound when snapping back to start/storage
+    [SerializeField] private AudioClip milkDropSound;       // Sound for milk drop
+    [SerializeField] private float snapSoundVolume = 0.7f;  // Volume for snap sounds
+    [SerializeField] private float pitchVariation = 0.1f;   // Slight pitch variation for more natural sound
+
     private bool isDragging = false;
     private bool isSnapped = false;
     private bool isCompleted = false;  // Renamed from isMilked - this marks if vessel has been counted
@@ -42,9 +49,18 @@ public class DragMilkVessel : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D cowCollider;
     private int milkLevel = 0;
+    private AudioSource audioSource; // For playing sounds
 
     // Each vessel needs its own droplet instance
     private MilkDroplet myDroplet;
+
+    void Awake()
+    {
+        // Add audio source component
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.volume = snapSoundVolume;
+    }
 
     void Start()
     {
@@ -146,6 +162,22 @@ public class DragMilkVessel : MonoBehaviour
             {
                 SnapToCircle(startCircle, 2);
             }
+        }
+    }
+
+    // Play sound with slight pitch variation
+    private void PlaySound(AudioClip clip, float volume)
+    {
+        if (clip != null && audioSource != null)
+        {
+            // Add slight pitch variation for more natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(clip, volume);
+            Debug.Log($"Playing sound: {clip.name}");
+        }
+        else if (clip == null)
+        {
+            Debug.LogWarning("Attempted to play null audio clip");
         }
     }
 
@@ -254,6 +286,9 @@ public class DragMilkVessel : MonoBehaviour
         
         if (circleNumber == 1)
         {
+            // Play target snap sound
+            PlaySound(targetSnapSound, snapSoundVolume);
+            
             // Mark target as occupied by this vessel
             isTargetOccupied = true;
             occupyingVessel = this;
@@ -268,6 +303,9 @@ public class DragMilkVessel : MonoBehaviour
         }
         else if (circleNumber == 2)
         {
+            // Play start/storage snap sound
+            PlaySound(startSnapSound, snapSoundVolume);
+            
             // Detailed logging
             Debug.Log($"VESSEL COMPLETION CHECK: [{name}] at final position - milkLevel: {milkLevel}, isCompleted: {isCompleted}");
             Debug.Log($"Current completion count: {completedVessels}/{totalVessels}");
@@ -309,7 +347,6 @@ public class DragMilkVessel : MonoBehaviour
         }
     }
 
-    // New coroutine for delayed win sequence
     private IEnumerator DelayedWinSequence()
     {
         // You could add visual effects here
@@ -335,17 +372,42 @@ public class DragMilkVessel : MonoBehaviour
         Debug.Log($"Changing cow sprite for vessel [{name}]");
         cowRenderer.sprite = cowMilkingSprite;
         
+        // Dedicated AudioSource for milk drop sound to control its duration
+        AudioSource dropAudioSource = null;
+        
         if (myDroplet != null)
         {
             myDroplet.TriggerDropletFall();
             Debug.Log($"Triggered droplet fall for vessel [{name}]");
+            
+            // Play milk drop sound with exact duration control
+            if (milkDropSound != null)
+            {
+                // Create a temporary AudioSource specifically for the milk drop sound
+                dropAudioSource = gameObject.AddComponent<AudioSource>();
+                dropAudioSource.clip = milkDropSound;
+                dropAudioSource.volume = snapSoundVolume;
+                dropAudioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+                dropAudioSource.Play();
+                
+                Debug.Log($"Playing milk drop sound for {milkingAnimationDuration}s");
+            }
         }
         else
         {
             Debug.LogError($"Droplet is null for vessel [{name}]");
         }
         
+        // Wait for the milk animation duration
         yield return new WaitForSeconds(milkingAnimationDuration);
+        
+        // Stop the milk drop sound if it's still playing
+        if (dropAudioSource != null && dropAudioSource.isPlaying)
+        {
+            dropAudioSource.Stop();
+            Destroy(dropAudioSource); // Clean up the temporary audio source
+            Debug.Log($"Stopped milk drop sound after {milkingAnimationDuration}s");
+        }
         
         cowRenderer.sprite = cowIdleSprite;
         Debug.Log($"Completed milking animation for vessel [{name}]");
@@ -394,6 +456,12 @@ public class DragMilkVessel : MonoBehaviour
                 cloneScript1.isOriginal = false;
                 cloneScript1.startCircle = circle3;
                 cloneScript1.targetCircle = targetCircle;
+                
+                // Pass audio clips to clone
+                cloneScript1.targetSnapSound = this.targetSnapSound;
+                cloneScript1.startSnapSound = this.startSnapSound;
+                cloneScript1.milkDropSound = this.milkDropSound;
+                
                 Debug.Log("Spawned first clone at circle3");
             }
         }
@@ -408,8 +476,24 @@ public class DragMilkVessel : MonoBehaviour
                 cloneScript2.isOriginal = false;
                 cloneScript2.startCircle = circle4;
                 cloneScript2.targetCircle = targetCircle;
+                
+                // Pass audio clips to clone
+                cloneScript2.targetSnapSound = this.targetSnapSound;
+                cloneScript2.startSnapSound = this.startSnapSound;
+                cloneScript2.milkDropSound = this.milkDropSound;
+                
                 Debug.Log("Spawned second clone at circle4");
             }
+        }
+    }
+
+    private void OnDisable()
+    {
+        // Stop any playing sounds when disabled
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log($"Stopped audio on disable for vessel [{name}]");
         }
     }
 }

@@ -21,6 +21,16 @@ public class FINALscreen : MonoBehaviour
     // Game 2 scene ranges (inclusive)
     private const int GAME2_START_SCENE = 6;
     private const int GAME2_END_SCENE = 10;
+    
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip finalSceneSound;     // Sound to play when final scene loads
+    [SerializeField] private float soundVolume = 0.8f;      // Volume for final scene sound
+    
+    // Flag to track if we've already played the final scene sound
+    private static bool finalSoundPlayed = false;
+    
+    // Audio source reference
+    private AudioSource audioSource;
 
     void Awake()
     {
@@ -29,6 +39,12 @@ public class FINALscreen : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Set up audio source
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.loop = false;
+            
             Debug.Log("FINALscreen instance created and set to persist between scenes");
         }
         else
@@ -61,6 +77,33 @@ public class FINALscreen : MonoBehaviour
     {
         // Check the scene that was just loaded
         CheckCurrentScene();
+        
+        // Check if we've loaded the final scene and should play sound
+        if (scene.buildIndex == FINAL_SCENE && !finalSoundPlayed && audioSource != null && finalSceneSound != null)
+        {
+            PlayFinalSceneSound();
+        }
+    }
+    
+    // Play the final scene sound once
+    private void PlayFinalSceneSound()
+    {
+        if (finalSoundPlayed) return; // Skip if already played
+        
+        audioSource.clip = finalSceneSound;
+        audioSource.volume = soundVolume;
+        audioSource.Play();
+        
+        finalSoundPlayed = true;
+        
+        Debug.Log("Final scene sound played");
+    }
+    
+    // Reset the sound played flag when returning to main menu
+    private void ResetFinalSound()
+    {
+        finalSoundPlayed = false;
+        Debug.Log("Final sound flag reset");
     }
     
     private void CheckCurrentScene()
@@ -87,6 +130,7 @@ public class FINALscreen : MonoBehaviour
             Debug.Log("Returning to main menu after completion - resetting progress");
             game1Completed = false;
             game2Completed = false;
+            ResetFinalSound(); // Reset the sound flag so it can play again next time
         }
         
         // If both games are completed, load the final scene
@@ -121,6 +165,7 @@ public class FINALscreen : MonoBehaviour
     {
         game1Completed = false;
         game2Completed = false;
+        ResetFinalSound(); // Reset the sound flag as well
         Debug.Log("Game progress reset");
     }
 }
