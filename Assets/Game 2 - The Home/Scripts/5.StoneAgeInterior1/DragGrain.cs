@@ -14,6 +14,13 @@ public class DragGrain : MonoBehaviour
     [SerializeField] private GameObject grainPrefab;  // Add grain prefab
     [SerializeField] private Vector3 spawnPosition;   // Add spawn position
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip snapSound;        // Sound when grain snaps to a circle
+    [SerializeField] private AudioClip millstoneSound;   // Sound when millstone flips
+    [SerializeField] private float snapSoundVolume = 0.7f;
+    [SerializeField] private float millstoneSoundVolume = 0.7f;
+    [SerializeField] private float pitchVariation = 0.1f; // Slight pitch variation for more natural sound
+
     [Header("Cloning")]
     [SerializeField] private bool isOriginal = true; // Flag to identify original grain
     [SerializeField] private float cloneOffsetX = 0.5f; // Horizontal offset for the clone
@@ -37,6 +44,7 @@ public class DragGrain : MonoBehaviour
     private BoxCollider2D millstoneCollider;
     private SpriteRenderer grainRenderer;
     private BoxCollider2D grainCollider; // Add reference to own collider
+    private AudioSource audioSource; // Audio source component for playing sounds
 
     // Static variables to track game state
     private static bool firstGrainComplete = false;  // Track if first grain is done
@@ -58,6 +66,10 @@ public class DragGrain : MonoBehaviour
         grainRenderer = GetComponent<SpriteRenderer>();
         millstoneCollider = millstone.GetComponent<BoxCollider2D>();
         grainCollider = GetComponent<BoxCollider2D>(); // Get own collider reference
+        
+        // Set up audio source
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
         
         // Store default sorting order
         defaultSortingOrder = grainRenderer.sortingOrder;
@@ -142,6 +154,10 @@ public class DragGrain : MonoBehaviour
                 transform.position = circle1.position;
                 isSnappedToCircle1 = true;
                 isDragging = false;
+                
+                // Play snap sound for Circle 1
+                PlaySnapSound();
+                
                 EnableMillstone();
                 return;
             }
@@ -198,6 +214,38 @@ public class DragGrain : MonoBehaviour
         }
     }
 
+    // Play snap sound with slight pitch variation
+    private void PlaySnapSound()
+    {
+        if (snapSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(snapSound, snapSoundVolume);
+            Debug.Log("Playing grain snap sound");
+        }
+        else if (snapSound == null)
+        {
+            Debug.LogWarning("Snap sound clip is not assigned!");
+        }
+    }
+    
+    // Play millstone flip sound with slight pitch variation
+    private void PlayMillstoneSound()
+    {
+        if (millstoneSound != null && audioSource != null)
+        {
+            // Add slight pitch variation for natural sound
+            audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+            audioSource.PlayOneShot(millstoneSound, millstoneSoundVolume);
+            Debug.Log("Playing millstone flip sound");
+        }
+        else if (millstoneSound == null)
+        {
+            Debug.LogWarning("Millstone sound clip is not assigned!");
+        }
+    }
+
     private void EnableMillstone()
     {
         millstone.enabled = true;
@@ -215,6 +263,9 @@ public class DragGrain : MonoBehaviour
 
     private void FlipMillstone()
     {
+        // Play millstone flip sound
+        PlayMillstoneSound();
+        
         flipCounter++;
         millstone.flipY = !millstone.flipY;
         Debug.Log($"Flip counter: {flipCounter}/{requiredFlips}");
@@ -265,6 +316,9 @@ public class DragGrain : MonoBehaviour
         isSnappedToCircle2 = true;
         isDragging = false;
         
+        // Play snap sound
+        PlaySnapSound();
+        
         // Release the dragging lock when snapped
         isAnyGrainBeingDragged = false;
         activeDraggedGrain = null;
@@ -302,6 +356,9 @@ public class DragGrain : MonoBehaviour
         transform.position = circle3.position;
         isSnappedToCircle2 = true;  // Reuse this flag for completion state
         isDragging = false;
+        
+        // Play snap sound
+        PlaySnapSound();
         
         // Release the dragging lock when snapped
         isAnyGrainBeingDragged = false;

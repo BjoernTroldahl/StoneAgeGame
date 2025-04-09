@@ -1746,6 +1746,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1051071254}
     - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
+      propertyPath: snapSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 624ec60a6d5523d4999a8b0803c1eed7, type: 3}
+    - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
       propertyPath: snapPoint2
       value: 
       objectReference: {fileID: 0}
@@ -1773,6 +1777,10 @@ PrefabInstance:
       propertyPath: millingStone
       value: 
       objectReference: {fileID: 870126249}
+    - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
+      propertyPath: millstoneSound
+      value: 
+      objectReference: {fileID: 8300000, guid: b8a498eead9b07e4e9fa1d582d0db462, type: 3}
     - target: {fileID: 6619254231289410716, guid: e85792b31f46b394e8bee218e490fd96, type: 3}
       propertyPath: clickTimeWindow
       value: 0.2
