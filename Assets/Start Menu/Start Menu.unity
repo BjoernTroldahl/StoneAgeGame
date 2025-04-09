@@ -735,7 +735,7 @@ MonoBehaviour:
   persistentScenes: 00000000050000000a0000000b000000
   backgroundMusic: {fileID: 8300000, guid: 2053ab4f8ad15b64db3f5439e93dde1b, type: 3}
   musicVolume: 0.7
-  fadeOutDuration: 2
+  fadeOutDuration: 0
 --- !u!1 &1232254784
 GameObject:
   m_ObjectHideFlags: 0
