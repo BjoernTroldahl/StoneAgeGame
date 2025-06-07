@@ -7,7 +7,7 @@ Aria Myrivili — Game director and producer
 
 Bjørn Troldahl (me) — Lead programmer
 
-Yuhan Liu — Sound design, music and assistant programmer
+Yuhan Liu — Sound designer, music composer and assistant programmer
 
 Zhangxian Rao — Art director and 2D artist
 
