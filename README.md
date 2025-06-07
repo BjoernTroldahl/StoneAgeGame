@@ -15,8 +15,6 @@ https://github.com/user-attachments/assets/7a7897c7-6658-4be5-869d-a5342c6ab9b8
 
 <img width="1919" alt="StoneAge" src="https://github.com/user-attachments/assets/947bd7c6-4d03-4311-ace0-7dfcdf0a4f7c" />
 
-
-
 <img width="1919" alt="StoneAge2" src="https://github.com/user-attachments/assets/d8fe0d96-67b0-431c-9a42-54a07b7a25c6" />
 
 ## How to install and play the game (current build only works for Windows x64)
