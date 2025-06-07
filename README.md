@@ -11,6 +11,8 @@ Yuhan Liu — Sound design, music and assistant programmer
 
 Zhangxian Rao — Art director and 2D artist
 
+<img width="1919" alt="StoneAge" src="https://github.com/user-attachments/assets/4aa33160-4f97-41ff-8b53-4fcacb94769f" />
+
 ## How to install and play the game (current build only works for Windows x64)
 
 Step 1: Download this GitHub repository as a ZIP-file and unzip it into a folder.
