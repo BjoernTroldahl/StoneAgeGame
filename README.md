@@ -13,6 +13,8 @@ Zhangxian Rao — Art director and 2D artist
 
 <img width="1919" alt="StoneAge" src="https://github.com/user-attachments/assets/4aa33160-4f97-41ff-8b53-4fcacb94769f" />
 
+<img width="1919" alt="StoneAge2" src="https://github.com/user-attachments/assets/61d3e263-c003-4e31-ae6c-76028f16c26b" />
+
 ## How to install and play the game (current build only works for Windows x64)
 
 Step 1: Download this GitHub repository as a ZIP-file and unzip it into a folder.
