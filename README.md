@@ -11,7 +11,7 @@ Yuhan Liu — Sound designer, music composer and assistant programmer
 
 Zhangxian Rao — Art director and 2D artist
 
-https://github.com/user-attachments/assets/7a7897c7-6658-4be5-869d-a5342c6ab9b8
+https://github.com/user-attachments/assets/b947e85a-4b6a-41cb-b102-589ce0a825b0
 
 <img width="1919" alt="StoneAge" src="https://github.com/user-attachments/assets/947bd7c6-4d03-4311-ace0-7dfcdf0a4f7c" />
 
